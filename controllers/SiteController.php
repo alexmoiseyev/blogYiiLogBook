@@ -108,11 +108,7 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
+  
     public function actionCreate()
     {
         $model = new Article();

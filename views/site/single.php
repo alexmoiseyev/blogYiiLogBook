@@ -27,7 +27,7 @@ use yii\helpers\Url;
 			</div>
 			<div class="col-lg-10 mx-auto">
 				<div class="content">
-					<p><?= $article->title; ?></p>
+					<p><?= $article->content; ?></p>
 				</div>
 			</div>
 		</article>
