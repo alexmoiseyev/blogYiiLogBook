@@ -40,13 +40,13 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link" href="/site/create">Create Article</a>
+                  <a class="nav-link" href="/create">Create Article</a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link" href="/site/contact">Contact</a>
+                  <a class="nav-link" href="/contact">Contact</a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link" href="<?= Url::toRoute(['site/author', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Author</a>
+                  <a class="nav-link" href="<?= Url::toRoute(['/author', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Author</a>
                </li>
                </li>
             </ul>

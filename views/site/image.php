@@ -8,16 +8,36 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="article-form">
+<section class="section">
+    <div class="container">
+        <p class="h3">Выберите изображение для вашей статьи:</p>
+        <div class="article-form">
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?= $form->field($model, 'image')->fileInput(['maxlength' => true, 'id' => 'image-input']) ?>
 
-    <?= $form->field($model, 'image')->fileInput(['maxlength' => true]) ?>
+    <div id="image-preview" style="display: none;">
+        <img id="preview-image" src="" alt="Image Preview" style="max-width: 200px;">
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>
+    </div>
+</section>
+<script>
+    document.getElementById('image-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function() {
+            document.getElementById('preview-image').src = reader.result;
+            document.getElementById('image-preview').style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
+    });
+</script>
