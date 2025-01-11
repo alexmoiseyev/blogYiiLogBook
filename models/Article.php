@@ -63,6 +63,7 @@ class Article extends \yii\db\ActiveRecord
             'category_id' => 'Category ID',
         ];
     }
+    
     public function viewedCounter(){
         $this->viewed += 1;
         return $this->save(false);
@@ -119,6 +120,9 @@ class Article extends \yii\db\ActiveRecord
     public function getAuthor()
     {
         return $this->hasOne(User::className(), ['id'=>'user_id']);
+    }
+    public static function getLatestArticles(){
+        return Article::find()->orderBy('date desc')->limit(4)->all();
     }
     public function saveTags($tags)
     {

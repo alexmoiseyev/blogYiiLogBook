@@ -37,7 +37,7 @@ use yii\helpers\Url;
 				'latestArticles'=>$latestArticles,
                 'categories'=>$categories,
                 'tags'=>$tags,
-               'article'=>$article
+               'articles'=>$articles,
             ]);?>
 		</div>
 	</div>

@@ -61,25 +61,18 @@ class SiteController extends Controller
             ],
         ];
     }
+    private function _getSharedData()
+    {
+        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all();
+        $categories = Category::getAll();
+        $tags = Tag::find()->all();
 
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
-    
-
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-   
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
+        return [
+            'latestArticles' => $latestArticles,
+            'tags' => $tags,
+            'categories' => $categories,
+        ];
+    }
     public function actionContact()
     {
         $model = new ContactForm();
@@ -92,45 +85,6 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionAuthor($id)
-    {
-        $articles = Article::find()->where(['user_id'=>$id])->all();
-        $user = User::findOne($id);
-        $name = $user->name??'No author';
-        $categories = Category::find()->all();
-        $tags = Tag::find()->all();
-        return $this->render('author', 
-        [
-            'articles'=>$articles,
-            'categories'=>$categories,
-            'tags'=>$tags,
-            'name'=>$name 
-        ]);
-    }
-
-  
-    public function actionCreate()
-    {
-        $model = new Article();
-        
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->saveArticle()) {
-                return $this->redirect(['set-image', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-    public function actionDelete($id)
-    {
-        Article::findOne($id)->delete();
-
-        return $this->redirect(['index']);
-    }
     public function actionSearch(){
         $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all(); 
         $search_input = Yii::$app->request->get('search');
@@ -140,35 +94,17 @@ class SiteController extends Controller
         $tags = Tag::find()->all();
         return $this->render('index',compact('articles','categories','tags','latestArticles'));
     }
-    public function actionSetImage($id)
-    {
-        $model = new ImageUpload;
-
-        if($this->request->isPost)
-        {
-            $article = Article::findOne($id);
-            $file = UploadedFile::getInstance($model, 'image');
-        
-            if($article->saveImage($model->uploadFile($file, $article->image)))
-            {
-                return $this->redirect(['view', 'id'=>$article->id]);
-            }
-        }
-        return $this->render('image', ['model'=>$model]);
-    }
     public function actionIndex()
     {
-        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all(); 
+        $latestArticles = Article::getLatestArticles();
         $articles = Article::find()->all();
-        $categories = Category::find()->all();
-        $tags = Tag::find()->all();
-        return $this->render('index', 
+        $sharedData = $this->_getSharedData();
+        return $this->render('index', array_merge(
+            $sharedData,
         [
             'latestArticles'=>$latestArticles,
             'articles'=>$articles,
-            'categories'=>$categories,
-            'tags'=>$tags,
-        ]);
+        ]));
     }
     public function actionView($id)
     {
@@ -184,31 +120,32 @@ class SiteController extends Controller
             'article'=>$article,
         ]);
     }
+    
     public function actionCategory($id)
     {
-        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all(); 
         $data = Category::getArticlesByCategory($id);
-        $categories = Category::getAll();
-        $tags = Tag::find()->all();
-        return $this->render('category',[
-            'latestArticles'=>$latestArticles,
-            'tags'=>$tags,
-            'categories'=>$categories,
-            'articles'=>$data['articles']
-        ]);
+        $sharedData = $this->_getSharedData();
+
+        return $this->render('category', array_merge($sharedData, ['articles' => $data['articles']]));
     }
+
     public function actionTag($id)
     {
-        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all(); 
         $data = Tag::getArticlesByTag($id);
-        $categories = Category::getAll();
-        $tags = Tag::find()->all();
-        
-        return $this->render('tag',[
-            'latestArticles'=>$latestArticles,
-            'tags'=>$tags,
-            'categories'=>$categories,
-            'articles'=>$data['articles']
-        ]);
+        $sharedData = $this->_getSharedData();
+
+        return $this->render('tag', array_merge($sharedData, ['articles' => $data['articles']]));
+    }
+    public function actionAuthor($id)
+    {
+        $articles = Article::find()->where(['user_id'=>$id])->all();
+        $name = User::findOne($id)->name;
+        $sharedData = $this->_getSharedData();
+        return $this->render('author', array_merge(
+$sharedData,
+        [
+            'articles'=>$articles,
+            'name'=>$name 
+        ]));
     }
 }

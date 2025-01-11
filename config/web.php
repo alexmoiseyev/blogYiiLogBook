@@ -25,6 +25,12 @@ $config = [
             'enableAutoLogin' => true,
             'loginUrl'=>['auth/login'],
         ],
+        'fingerprint' => [
+        'class' => 'yii\behaviors\FingerprintBehavior',
+            'attributes' => [
+                'IP', 'User-Agent', 'Accept-Language', 'accept', 'X-Forwarded-For',
+            ],
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -49,7 +55,10 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '<a:(admin)>' => 'admin/<a>',
+                '<a:(create|set-image|delete)>' => 'article/<a>',
                 '<action:\w+>'=>'site/<action>',
+                
             ],
         ],
         
