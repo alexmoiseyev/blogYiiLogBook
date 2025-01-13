@@ -65,6 +65,7 @@ use yii\helpers\Html;
 							],
 						]) ?>
 						<?= Html::a('Set Image', ['set-image', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
+						<?= Html::a('Set Tags', ['article/set-tags', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
 						<? endif;?>
 					</div>
 				</article>

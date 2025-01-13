@@ -55,8 +55,8 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '<a:(admin)>' => 'admin/<a>',
-                '<a:(create|set-image|delete)>' => 'article/<a>',
+                '<a:(admin)>' => 'admin/default<a>',
+                '<a:(create|set-image|set-tags|delete)>' => 'article/<a>',
                 '<action:\w+>'=>'site/<action>',
                 
             ],

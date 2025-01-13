@@ -14,7 +14,7 @@ use yii\helpers\Url;
 					<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id ])?>" class="ml-1"><?= $article->category->title; ?></a>
 					</li>
 					<li class="list-inline-item">Tags : 
-						<?php foreach($tags as $tag):?>
+						<?php foreach($article->tags as $tag):?>
                         	<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
                      	<?php endforeach; ?>
 					</li>

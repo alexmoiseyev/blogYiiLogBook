@@ -6,6 +6,7 @@ use app\models\Article;
 use app\models\Tag;
 use app\models\User;
 use app\models\ArticleTag;
+use app\models\ArticleUser;
 use app\models\ImageUpload;
 use Yii;
 use yii\web\UploadedFile;
@@ -112,7 +113,7 @@ class SiteController extends Controller
         $categories = Article::getAll();
         $tags = Tag::find()->all();
 
-        $article->viewedCounter();
+        $article->viewedCounter($id);
         
         return $this->render('single',[
             'tags'=>$tags,
@@ -141,8 +142,9 @@ class SiteController extends Controller
         $articles = Article::find()->where(['user_id'=>$id])->all();
         $name = User::findOne($id)->name;
         $sharedData = $this->_getSharedData();
-        return $this->render('author', array_merge(
-$sharedData,
+        return $this->render('author', 
+array_merge(
+        $sharedData,
         [
             'articles'=>$articles,
             'name'=>$name 

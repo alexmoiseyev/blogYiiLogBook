@@ -23,11 +23,11 @@ use yii\helpers\Url;
 							</li>
                      <li class="list-inline-item">Tags:
 							<?php foreach($article->tags as $tag):?>
-                        	<a href="<?= Url::toRoute(['site/tag'])?>" class="ml-1"><?= $tag->title; ?></a>
+                        	<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
                      	<?php endforeach; ?>
                         </li>
 						<li class="list-inline-item">Viewed:
-							<?=$article->viewed?>
+							<?=$article->getUsers()->count();?>
 						</li>
 						</ul>
 						<p><?=$article->description;?></p> 

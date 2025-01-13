@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\User;
+use app\models\ArticleUser;
 use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "article".
@@ -64,9 +66,11 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
     
-    public function viewedCounter(){
-        $this->viewed += 1;
-        return $this->save(false);
+    public function viewedCounter($id){
+        $user = new ArticleUser;
+        $user->user_id = Yii::$app->user->id;
+        $user->article_id=$id;
+        return $user->save(false);
     }
     public function saveImage($filename){
         $this->image = $filename;
@@ -116,14 +120,6 @@ class Article extends \yii\db\ActiveRecord
         $selectedIds = $this->getTags()->select('id')->asArray()->all();
         return ArrayHelper::getColumn($selectedIds, 'id');
     }
-
-    public function getAuthor()
-    {
-        return $this->hasOne(User::className(), ['id'=>'user_id']);
-    }
-    public static function getLatestArticles(){
-        return Article::find()->orderBy('date desc')->limit(4)->all();
-    }
     public function saveTags($tags)
     {
         if (is_array($tags))
@@ -136,6 +132,17 @@ class Article extends \yii\db\ActiveRecord
                 $this->link('tags', $tag);
             }
         }
+    }
+    public function getAuthor()
+    {
+        return $this->hasOne(User::className(), ['id'=>'user_id']);
+    }
+    public static function getLatestArticles(){
+        return Article::find()->orderBy('date desc')->limit(4)->all();
+    }
+    public function getUsers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('article_user', ['article_id' => 'id']);
     }
     public function clearCurrentTags()
     {
