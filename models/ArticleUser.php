@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int|null $article_id
  * @property int|null $user_id
+ * @property int|null $date
  *
  * @property Article $article
  * @property User $user
@@ -57,6 +58,11 @@ class ArticleUser extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Article::class, ['id' => 'article_id']);
     }
+    /**
+     * Gets query for [[Tag]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
 
     
 }

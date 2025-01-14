@@ -29,6 +29,14 @@ use yii\helpers\Html;
 	<div class="container">
 		<div class="row d-flex justify-content-center">
 			<div class="col-lg-8  mb-5 mb-lg-0">
+			<?php if(!Yii::$app->user->isGuest):?>
+				<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
+					<div class="text-center">
+						<a href="<?= Url::toRoute(['author', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-primary">My articles</a>
+						<a href="<?= Url::toRoute(['history', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-outline-warning">History</a>
+					</div>
+				<?php endif;?>
+			<?php endif;?>
                 <?php foreach($articles as $article):?>
 				<article class="row mb-5">
 					<div class	="col-12">
@@ -51,21 +59,23 @@ use yii\helpers\Html;
                      	<?php endforeach; ?>
                         </li>
 						<li class="list-inline-item">Viewed:
-							<?=$article->viewed?>
+							<?=$article->getUsers()->count();?>
 						</li>
 						</ul>
 						<p><?=$article->description;?></p> 
                         <a href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>" class="btn btn-outline-primary">Continue Reading</a>
-						<?php if(Yii::$app->user->identity->name == $article->author->name):?>
-						<?= Html::a('Delete', ['delete', 'id' => $article->id], [
-							'class' => 'btn btn-danger',
-							'data' => [
-								'confirm' => 'Are you sure you want to delete this item?',
-								'method' => 'post',
-							],
-						]) ?>
-						<?= Html::a('Set Image', ['set-image', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
-						<?= Html::a('Set Tags', ['article/set-tags', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
+						<?php if(!Yii::$app->user->isGuest):?>
+							<?php if(Yii::$app->user->identity->name == $article->author->name):?>
+								<?= Html::a('Delete', ['delete', 'id' => $article->id], [
+									'class' => 'btn btn-danger',
+									'data' => [
+										'confirm' => 'Are you sure you want to delete this item?',
+										'method' => 'post',
+									],
+								]) ?>
+								<?= Html::a('Set Image', ['article/set-image', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
+								<?= Html::a('Set Tags', ['article/set-tags', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
+							<? endif;?>
 						<? endif;?>
 					</div>
 				</article>

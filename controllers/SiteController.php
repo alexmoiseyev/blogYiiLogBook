@@ -62,6 +62,7 @@ class SiteController extends Controller
             ],
         ];
     }
+    
     private function _getSharedData()
     {
         $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all();
@@ -73,6 +74,10 @@ class SiteController extends Controller
             'tags' => $tags,
             'categories' => $categories,
         ];
+    }
+    private function _getUser(){
+        $user_id = Yii::$app->user->identity->id ?? '0';
+        return $user_id;
     }
     public function actionContact()
     {
@@ -98,7 +103,7 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $latestArticles = Article::getLatestArticles();
-        $articles = Article::find()->all();
+        $articles = Article::find()->orderBy('viewed desc')->all();
         $sharedData = $this->_getSharedData();
         return $this->render('index', array_merge(
             $sharedData,
@@ -140,6 +145,27 @@ class SiteController extends Controller
     public function actionAuthor($id)
     {
         $articles = Article::find()->where(['user_id'=>$id])->all();
+        $name = User::findOne($id)->name??'0';
+        $sharedData = $this->_getSharedData();
+        return $this->render('author', 
+array_merge(
+        $sharedData,
+        [
+            'articles'=>$articles,
+            'name'=>$name 
+        ]));
+    }
+    public function actionHistory($id)
+    {
+        $articleIds = ArticleUser::find()
+        ->select('article_id')
+        ->where(['user_id' =>$this->_getUser()])
+        ->column();
+        $articles = Article::find()
+        ->where(['article.id'=>$articleIds])
+        ->innerJoin('article_user', 'article.id = article_user.article_id')
+        ->orderBy('article_user.date desc')
+        ->all();
         $name = User::findOne($id)->name;
         $sharedData = $this->_getSharedData();
         return $this->render('author', 

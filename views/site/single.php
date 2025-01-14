@@ -18,6 +18,9 @@ use yii\helpers\Url;
                         	<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
                      	<?php endforeach; ?>
 					</li>
+					<li class="list-inline-item">Viewed:
+						<?=$article->getUsers()->count();?>
+					</li>
 				</ul>
 			</div>
 			<div class="col-12 mb-3">

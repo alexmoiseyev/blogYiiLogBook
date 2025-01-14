@@ -19,7 +19,7 @@ use yii\helpers\Url;
 							<a href="<?= Url::toRoute(['site/author', 'id'=>$article->id ?? 3]);?>"><?=$article->author->name ?? 'No author';?></a>
 							</li>
 							<li class="list-inline-item"><?= $article->getDate(); ?></li>
-							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id])?>" class="ml-1"><?= $article->category->title; ?></a>
+							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id??'0'])?>" class="ml-1"><?= $article->category->title; ?></a>
 							</li>
                      <li class="list-inline-item">Tags:
 							<?php foreach($article->tags as $tag):?>

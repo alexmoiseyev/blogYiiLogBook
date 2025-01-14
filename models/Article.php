@@ -66,13 +66,30 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
     
-    public function viewedCounter($id){
+    public function viewedCounter($id)
+{
+    $userId = Yii::$app->user->id;
+    $articleId = $id;
+
+    $existingEntry = ArticleUser::find()
+        ->where(['user_id' => $userId, 'article_id' => $articleId])
+        ->one();
+
+    if (!$existingEntry) {
         $user = new ArticleUser;
-        $user->user_id = Yii::$app->user->id;
-        $user->article_id=$id;
-        return $user->save(false);
+        $user->user_id = $userId;
+        $user->article_id = $articleId;
+        $user->date = date('Y-m-d H:i:s');
+
+        if ($user->save(false)) {
+            $article = Article::findOne($id);
+            $article->viewed = $article->viewed + 1;
+            $article->save(false);
+        }
     }
-    public function saveImage($filename){
+
+    return true;
+}    public function saveImage($filename){
         $this->image = $filename;
         return $this->save(false);
     }

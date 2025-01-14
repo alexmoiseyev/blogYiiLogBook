@@ -45,9 +45,11 @@
                <li class="nav-item">
                   <a class="nav-link" href="/contact">Contact</a>
                </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="<?= Url::toRoute(['/author', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Author</a>
-               </li>
+               <?php if(!Yii::$app->user->isGuest):?>
+                  <li class="nav-item">
+                     <a class="nav-link" href="<?= Url::toRoute(['/author', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Profile</a>
+                  </li>
+               <?php endif; ?>
                </li>
             </ul>
             

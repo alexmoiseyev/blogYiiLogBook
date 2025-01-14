@@ -53,6 +53,14 @@ class m250113_082758_create_article_user_table extends Migration
             'id',
             'CASCADE'
         );
+         $this->addForeignKey(
+        'fk_article_user_article',
+        'article_user',
+        'article_id',
+        'article',
+        'id',
+        'CASCADE'
+    );
     }
     public function down()
     {

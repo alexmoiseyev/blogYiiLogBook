@@ -38,7 +38,16 @@ class ArticleController extends Controller
             ],
         ];
     }
-
+    public function accessRules()
+    {
+        return [
+            [
+                'actions' => ['author'],
+                'allow' => false,
+                'roles' => ['admin'], // Only allow authenticated users
+            ],
+        ];
+    }
     /**
      * {@inheritdoc}
      */
