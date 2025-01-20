@@ -29,10 +29,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['logout', 'author'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'author'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -146,13 +146,15 @@ class SiteController extends Controller
     {
         $articles = Article::find()->where(['user_id'=>$id])->all();
         $name = User::findOne($id)->name??'0';
+        $user = User::findOne($id);
         $sharedData = $this->_getSharedData();
         return $this->render('author', 
 array_merge(
         $sharedData,
         [
             'articles'=>$articles,
-            'name'=>$name 
+            'name'=>$name ,
+            'user'=>$user
         ]));
     }
     public function actionHistory($id)
@@ -167,13 +169,15 @@ array_merge(
         ->orderBy('article_user.date desc')
         ->all();
         $name = User::findOne($id)->name;
+        $user = User::findOne($id);
         $sharedData = $this->_getSharedData();
         return $this->render('author', 
 array_merge(
         $sharedData,
         [
             'articles'=>$articles,
-            'name'=>$name 
+            'name'=>$name ,
+            'user'=>$user
         ]));
     }
 }

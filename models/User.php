@@ -104,4 +104,20 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         
         return Yii::$app->user->login($this);
     }
+
+    public function saveImage($filename)
+    {
+        $this->image = $filename;
+        return $this->save(false);
+    }
+    public function getImage()
+    {
+        return ($this->image) ? '/uploads/' . $this->image : '/uploads/no-image.png';
+    }
+
+    public function deleteImage()
+    {
+        $imageUploadModel = new ImageUpload();
+        $imageUploadModel->deleteCurrentImage($this->image);
+    }
 }

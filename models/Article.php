@@ -89,7 +89,9 @@ class Article extends \yii\db\ActiveRecord
     }
 
     return true;
-}    public function saveImage($filename){
+}    
+    public function saveImage($filename)
+    {
         $this->image = $filename;
         return $this->save(false);
     }

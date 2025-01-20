@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Url;
 use yii\helpers\Html;
+use app\models\User;
 ?>
 <section class="section-sm border-bottom">
 	<div class="container">
@@ -19,7 +20,13 @@ use yii\helpers\Html;
 				</div>
 			</div>
 			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
-				<img loading="lazy" class="rounded-lg img-fluid" src="/markup/images/author.jpg">
+			
+				<img loading="lazy" class="rounded-lg img-fluid" src="<?= $user->getImage()??'/markup/images/author.jp'?>">
+					<?php if(!Yii::$app->user->isGuest):?>
+						<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
+							<a href="<?= Url::toRoute(['article/set-avatar', 'id'=>$user->id]);?>"><?='change avatar'?></a>
+						<?php endif;?>
+					<?php endif;?>
 			</div>
 			<div class="col-lg-9 col-md-8 content text-center text-md-left">
 				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet. Donec nisi dolor, consequat vel pretium id, auctor in dui. Nam iaculis, neque ac ullamcorper. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet.</p>
@@ -51,7 +58,7 @@ use yii\helpers\Html;
 								<a href="<?= Url::toRoute(['site/author', 'id'=>$article->id]);?>"><?=$article->author->name;?></a>
 							</li>
 							<li class="list-inline-item"><?= $article->getDate(); ?></li>
-							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id])?>" class="ml-1"><?= $article->category->title; ?></a>
+							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id??'0'])?>" class="ml-1"><?= $article->category->title??'No category'; ?></a>
 							</li>
                      <li class="list-inline-item">Tags:
 							<?php foreach($article->tags as $tag):?>

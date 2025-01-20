@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 use app\models\Article;
+use app\models\User;
 use app\models\ImageUpload;
 use app\models\Tag;
 use Yii;
@@ -21,10 +22,10 @@ class ArticleController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['logout','create'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout','create'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -117,5 +118,21 @@ class ArticleController extends Controller
             'tags'=>$tags
         ]);
         
+    }
+    public function actionSetAvatar($id)
+    {
+        $model = new ImageUpload;
+
+        if($this->request->isPost)
+        {
+            $user = User::findOne($id);
+            $file = UploadedFile::getInstance($model, 'image');
+        
+            if($user->saveImage($model->uploadFile($file, $user->image)))
+            {
+                return $this->redirect(['site/author', 'id'=>$user->id]);
+            }
+        }
+        return $this->render('image', ['model'=>$model]);
     }
 }
