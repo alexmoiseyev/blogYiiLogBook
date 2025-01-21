@@ -145,7 +145,6 @@ class SiteController extends Controller
     public function actionAuthor($id)
     {
         $articles = Article::find()->where(['user_id'=>$id])->all();
-        $name = User::findOne($id)->name??'0';
         $user = User::findOne($id);
         $sharedData = $this->_getSharedData();
         return $this->render('author', 
@@ -153,7 +152,6 @@ array_merge(
         $sharedData,
         [
             'articles'=>$articles,
-            'name'=>$name ,
             'user'=>$user
         ]));
     }
@@ -168,7 +166,6 @@ array_merge(
         ->innerJoin('article_user', 'article.id = article_user.article_id')
         ->orderBy('article_user.date desc')
         ->all();
-        $name = User::findOne($id)->name;
         $user = User::findOne($id);
         $sharedData = $this->_getSharedData();
         return $this->render('author', 
@@ -176,7 +173,6 @@ array_merge(
         $sharedData,
         [
             'articles'=>$articles,
-            'name'=>$name ,
             'user'=>$user
         ]));
     }

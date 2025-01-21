@@ -26,6 +26,7 @@ class SignupForm extends Model
         {
             $user = new User();
             $user->attributes = $this->attributes;
+            $user->password = md5($user->password);
             return $user->create();
         }
     }

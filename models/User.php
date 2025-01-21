@@ -83,7 +83,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     public function validatePassword($password){
-        return ($this->password == $password)? true : false;
+        return md5($this->password == $password)? true : false;
     }
     public function create()
     {
