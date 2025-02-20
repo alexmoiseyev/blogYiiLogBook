@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $image
  * @property int|null $viewed
  * @property int|null $user_id
+ * @property int|null $likes
  * @property int|null $status
  * @property int|null $category_id
  *
@@ -39,7 +40,7 @@ class Article extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'required'],
+            [['title', 'description', 'content'], 'required'],
             [['title', 'description', 'content'], 'string'],
             [['date'], 'date', 'format'=>'php:Y-m-d'],
             [['date'], 'default', 'value'=>date('Y-m-d')],
@@ -63,33 +64,48 @@ class Article extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'status' => 'Status',
             'category_id' => 'Category ID',
+            'likes' => 'Likes',
         ];
     }
-    
     public function viewedCounter($id)
-{
-    $userId = Yii::$app->user->id;
-    $articleId = $id;
-
-    $existingEntry = ArticleUser::find()
-        ->where(['user_id' => $userId, 'article_id' => $articleId])
-        ->one();
-
-    if (!$existingEntry) {
-        $user = new ArticleUser;
-        $user->user_id = $userId;
-        $user->article_id = $articleId;
-        $user->date = date('Y-m-d H:i:s');
-
-        if ($user->save(false)) {
-            $article = Article::findOne($id);
-            $article->viewed = $article->viewed + 1;
-            $article->save(false);
-        }
+    {
+        $user = Yii::$app->user->identity;
+        $redis = Yii::$app->redis;
+        $redis->sadd("article:{$id}:views", $user->id);
+        $redis->sadd("user:{$user->id}:views", $id);
+        return true;
+    }    
+    public function countViews(){
+        $redis = Yii::$app->redis;
+        return $redis->scard("article:{$this->id}:views");
     }
+    // public function viewedCounter($id)
+    // {
+    //     $userId = Yii::$app->user->id;
+    //     $articleId = $id;
 
-    return true;
-}    
+    //     $existingEntry = ArticleUser::find()
+    //         ->where(['user_id' => $userId, 'article_id' => $articleId])
+    //         ->one();
+
+    //     if (!$existingEntry) {
+    //         $user = new ArticleUser;
+    //         $user->user_id = $userId;
+    //         $user->article_id = $articleId;
+    //         $user->date = date('Y-m-d H:i:s');
+
+    //         if ($user->save(false)) {
+    //             $article = Article::findOne($id);
+    //             $article->viewed = $article->viewed + 1;
+    //             $article->save(false);
+    //         }
+    //     }
+
+    //     return true;
+    // }    
+    public function likeCounter(){
+
+    }
     public function saveImage($filename)
     {
         $this->image = $filename;
@@ -159,10 +175,6 @@ class Article extends \yii\db\ActiveRecord
     public static function getLatestArticles(){
         return Article::find()->orderBy('date desc')->limit(4)->all();
     }
-    public function getUsers()
-    {
-        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('article_user', ['article_id' => 'id']);
-    }
     public function clearCurrentTags()
     {
         ArticleTag::deleteAll(['article_id'=>$this->id]);
@@ -175,6 +187,21 @@ class Article extends \yii\db\ActiveRecord
         return $data;
     }
 
+    public function like($user){
+        $redis = Yii::$app->redis;
+        $redis->sadd("article:{$this->id}:likes", $user->id);
+        $redis->sadd("user:{$user->id}:likes", $this->id);
+    }
+
+    public function unLike($user){
+        $redis = Yii::$app->redis;
+        $redis->srem("article:{$this->id}:likes", $user->id);
+        $redis->srem("user:{$user->id}:likes", $this->id);
+    }
+    public function countLikes(){    
+        $redis = Yii::$app->redis;
+        return $redis->scard("article:{$this->id}:likes");
+    }
     public function saveArticle(){
         $this->user_id = Yii::$app->user->id;
         $this->date=date('Y-m-d');

@@ -5,6 +5,8 @@ use yii\helpers\Url;
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-8  mb-5 mb-lg-0">
+				<?php if($articles):?>
+					<p class="f-20"><?=$search ?? ''?></p>
                 <?php foreach($articles as $article):?>
 				<article class="row mb-5">
 					<div class	="col-12">
@@ -27,7 +29,7 @@ use yii\helpers\Url;
                      	<?php endforeach; ?>
                         </li>
 						<li class="list-inline-item">Viewed:
-							<?=$article->getUsers()->count();?>
+							<?=$article->countViews()?>
 						</li>
 						</ul>
 						<p><?=$article->description;?></p> 
@@ -35,11 +37,14 @@ use yii\helpers\Url;
 					</div>
 				</article>
                 <?php endforeach;?>
+				<?php else: ?>
+					<p class="">articles with title '<?=$search?>' not found</p>
+				<?php endif;?>
 			</div>
 			
          <?= $this->render('/partials/sidebar.php', [
-                'categories'=>$categories,
-                'tags'=>$tags,
+				'categories'=>$categories,
+				'tags'=>$tags,
                'articles'=>$articles,
 			   'latestArticles'=>$latestArticles,
             ]);?>

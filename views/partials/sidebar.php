@@ -1,5 +1,8 @@
 <?php
+
+use yii\helpers\Html;
 use yii\helpers\Url;
+
 ?>
 <aside class="col-lg-4">
    <div class="widget">
@@ -15,9 +18,11 @@ use yii\helpers\Url;
       <h5 class="widget-title"><span>Categories</span></h5>
       <ul class="list-unstyled widget-list">
          <?php foreach($categories as $category):?>
-            <li><a href="<?= Url::toRoute(['site/category','id'=>$category->id])?>" class="d-flex"><?=$category->title?></a>
-            <span class="post-count pull-right"> (<?= $category->getArticlesCount();?>)</span>
+            <?php if($category->getArticlesCount() > 0):?>
+               <li><a href="<?= Url::toRoute(['site/category','id'=>$category->id])?>" class="d-flex"><?=$category->title?></a>
+               <span class="post-count pull-right"> (<?= $category->getArticlesCount();?>)</span>
             </li>
+            <?php endif; ?>
          <?php endforeach;?>
       </ul>
    </div>

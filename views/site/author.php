@@ -21,7 +21,7 @@ use app\models\User;
 			</div>
 			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
 			
-				<img loading="lazy" class="rounded-lg img-fluid" src="<?= $user->getImage()??'/markup/images/author.jp'?>">
+				<img loading="lazy" class="rounded-lg img-fluid" src="<?= $user->getImage()??'/markup/images/author.jpg'?>">
 					<?php if(!Yii::$app->user->isGuest):?>
 						<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
 							<a href="<?= Url::toRoute(['article/set-avatar', 'id'=>$user->id]);?>" class="ml-1 ">
@@ -37,13 +37,17 @@ use app\models\User;
 				<p>Lorem ipsum sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet. Donec nisi dolor, consequat vel pretium id, auctor in dui. Nam iaculis, neque ac ullamcorper. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet.</p>
 				<p>Donec nisi dolor, consequat vel pretium id, auctor in dui. Nam iaculis, neque ac ullamcorper.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue.</p>
 			</div>
-			<section class="section">
-	<div class="container">
-		<div class="row d-flex justify-content-center">
-			<div class="col-lg-8  mb-5 mb-lg-0">
+			</div>
+	</div>
+	
+</section>
+
+<section class="section">
+		<div class="d-flex justify-content-center">
+			<div class="col-lg-8 mb-5 mb-lg-0">
 			<?php if(!Yii::$app->user->isGuest):?>
 				<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
-					<div class="text-center">
+					<div class="d-flex justify-content-center mb-20">
 						<a href="<?= Url::toRoute(['author', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-primary">My articles</a>
 						<a href="<?= Url::toRoute(['history', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-outline-warning">History</a>
 					</div>
@@ -51,7 +55,7 @@ use app\models\User;
 			<?php endif;?>
                 <?php foreach($articles as $article):?>
 				<article class="row mb-5">
-					<div class	="col-12">
+					<div class="col-12">
 						<div class="text-center">
 							<img loading="lazy" src="<?= $article->getImage();?>" class="img-fluid img-thumbnail" alt="post-thumb" style="height:440px;">
 						</div>
@@ -60,7 +64,7 @@ use app\models\User;
 						<h3><a class="post-title" href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>"><?=$article->title?></a></h3>
 						<ul class="list-inline post-meta mb-4">
 							<li class="list-inline-item"><i class="ti-user mr-2"></i>
-								<a href="<?= Url::toRoute(['site/author', 'id'=>$article->id]);?>"><?=$article->author->name;?></a>
+								<a href="<?= Url::toRoute(['site/author', 'id'=>$article->author->id]);?>"><?=$article->author->name;?></a>
 							</li>
 							<li class="list-inline-item"><?= $article->getDate(); ?></li>
 							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id??'0'])?>" class="ml-1"><?= $article->category->title??'No category'; ?></a>
@@ -71,7 +75,7 @@ use app\models\User;
                      	<?php endforeach; ?>
                         </li>
 						<li class="list-inline-item">Viewed:
-							<?=$article->getUsers()->count();?>
+							<?=$article->countViews();?>
 						</li>
 						</ul>
 						<p><?=$article->description;?></p> 
@@ -91,12 +95,8 @@ use app\models\User;
 						<? endif;?>
 					</div>
 				</article>
+				<hr>
                 <?php endforeach;?>
 			</div>
 		</div>
-	</div>
-</section>
-		</div>
-	</div>
-	
 </section>

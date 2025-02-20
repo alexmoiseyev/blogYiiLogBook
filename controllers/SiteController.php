@@ -18,7 +18,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-
+use yii\httpclient\Client;
 class SiteController extends Controller
 {
     /**
@@ -98,7 +98,13 @@ class SiteController extends Controller
         $articles = Article::find()->where(['like', 'replace(title, " ", "")', $search])->all();
         $categories = Category::find()->all();
         $tags = Tag::find()->all();
-        return $this->render('index',compact('articles','categories','tags','latestArticles'));
+        return $this->render('index',compact(
+            'articles',
+            'categories',
+            'tags',
+            'latestArticles',
+            'search'
+        ));
     }
     public function actionIndex()
     {
@@ -157,16 +163,13 @@ array_merge(
     }
     public function actionHistory($id)
     {
-        $articleIds = ArticleUser::find()
-        ->select('article_id')
-        ->where(['user_id' =>$this->_getUser()])
-        ->column();
-        $articles = Article::find()
-        ->where(['article.id'=>$articleIds])
-        ->innerJoin('article_user', 'article.id = article_user.article_id')
-        ->orderBy('article_user.date desc')
-        ->all();
+        
+        $redis = Yii::$app->redis;
         $user = User::findOne($id);
+        $key = "user:{$user->id}:views";
+
+        $articles = Article::find()->where(['id' => $redis->smembers($key)])->all();
+
         $sharedData = $this->_getSharedData();
         return $this->render('author', 
 array_merge(
@@ -176,4 +179,6 @@ array_merge(
             'user'=>$user
         ]));
     }
+
+    
 }

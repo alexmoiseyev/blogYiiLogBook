@@ -19,13 +19,12 @@ class ImageUpload extends Model{
     }
 
 
-    public function uploadFile(UploadedFile $file, $currentImage)
+    public function uploadFile(UploadedFile $file)
     {
         $this->image = $file;
 
        if($this->validate())
        {
-           $this->deleteCurrentImage($currentImage);
            return $this->saveImage();
        }
 

@@ -19,7 +19,7 @@ use yii\helpers\Url;
                      	<?php endforeach; ?>
 					</li>
 					<li class="list-inline-item">Viewed:
-						<?=$article->getUsers()->count();?>
+						<?=$article->countViews()?>
 					</li>
 				</ul>
 			</div>
@@ -32,6 +32,17 @@ use yii\helpers\Url;
 				<div class="content">
 					<p><?= $article->content; ?></p>
 				</div>
+			</div>
+			<div class="article-likes"> 
+					Likes: <span class="likes-count"><?=$article->countLikes()?></span>
+					<a href="<?= Url::toRoute(['/article/unlike' ,'id'=>$article->id]);?>" class="btn btn-danger button-unlike" data-id="<?=1?>">
+							Unlike&nbsp;&nbsp;<span class="fa fa-thumbs-up"></span>
+					</a>
+					
+					<a href="<?= Url::toRoute(['/article/like','id'=>$article->id]);?>" class="btn btn-success button-like" data-id="<?=2?>">
+							Like&nbsp;&nbsp;<span class="fa fa-thumbs-down"></span>
+					</a>
+					
 			</div>
 		</article>
 	</div>

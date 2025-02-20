@@ -13,7 +13,9 @@ $config = [
     ],
     
     'components' => [
-        
+        'httpclient' => [
+        'class' => 'yii\httpclient\Client',
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'cxzd3248327543667dfdsf',
@@ -63,7 +65,12 @@ $config = [
                 
             ],
         ],
-        
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
     ],
     'modules' => [
         'admin' => [

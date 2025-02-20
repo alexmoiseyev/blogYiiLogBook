@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 <section class="section">
     <div class="container">
-        <p class="h3">Выберите изображение для вашей статьи:</p>
+        <p class="h3">Выберите изображение для вашего профиля:</p>
         <div class="article-form">
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
