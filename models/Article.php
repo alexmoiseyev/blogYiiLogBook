@@ -67,6 +67,43 @@ class Article extends \yii\db\ActiveRecord
             'likes' => 'Likes',
         ];
     }
+    public static function getAll()
+    {
+        $cache = Yii::$app->cache;
+        $key = 'all_articles';
+        
+        $data = $cache->get($key);
+
+        if ($data === false) {
+
+            $data = Article::find()
+            ->orderBy('date desc')
+            ->all();
+            
+            $cache->set($key, $data, 3600);// Кешируем на 1 час
+        }
+        
+        return $data;
+    }
+    public static function getLatestArticles()
+    {
+        $cache = Yii::$app->cache;
+        $key = 'latest_articles';
+        
+        $data = $cache->get($key);
+        
+        if ($data === false) {
+            $data = Article::find()
+                ->orderBy('date desc')
+                ->limit(4)
+                ->all();
+                
+            // Кешируем на 30 минут    
+            $cache->set($key, $data, 1800);
+        }
+        
+        return $data;
+    }
     public function viewedCounter($id)
     {
         $user = Yii::$app->user->identity;
@@ -78,33 +115,6 @@ class Article extends \yii\db\ActiveRecord
     public function countViews(){
         $redis = Yii::$app->redis;
         return $redis->scard("article:{$this->id}:views");
-    }
-    // public function viewedCounter($id)
-    // {
-    //     $userId = Yii::$app->user->id;
-    //     $articleId = $id;
-
-    //     $existingEntry = ArticleUser::find()
-    //         ->where(['user_id' => $userId, 'article_id' => $articleId])
-    //         ->one();
-
-    //     if (!$existingEntry) {
-    //         $user = new ArticleUser;
-    //         $user->user_id = $userId;
-    //         $user->article_id = $articleId;
-    //         $user->date = date('Y-m-d H:i:s');
-
-    //         if ($user->save(false)) {
-    //             $article = Article::findOne($id);
-    //             $article->viewed = $article->viewed + 1;
-    //             $article->save(false);
-    //         }
-    //     }
-
-    //     return true;
-    // }    
-    public function likeCounter(){
-
     }
     public function saveImage($filename)
     {
@@ -172,25 +182,20 @@ class Article extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id'=>'user_id']);
     }
-    public static function getLatestArticles(){
-        return Article::find()->orderBy('date desc')->limit(4)->all();
-    }
     public function clearCurrentTags()
     {
         ArticleTag::deleteAll(['article_id'=>$this->id]);
     }
-    public static function getAll(){
-        $query = Article::find();
-        $articles = $query->all();
-        $data['articles'] = $articles;
-        
-        return $data;
-    }
-
+   
     public function like($user){
+
         $redis = Yii::$app->redis;
+        $cache = Yii::$app->cache;
+
         $redis->sadd("article:{$this->id}:likes", $user->id);
         $redis->sadd("user:{$user->id}:likes", $this->id);
+        
+        $cache->delete('likes_count_' . $this->id);
     }
 
     public function unLike($user){
@@ -205,6 +210,15 @@ class Article extends \yii\db\ActiveRecord
     public function saveArticle(){
         $this->user_id = Yii::$app->user->id;
         $this->date=date('Y-m-d');
-        return $this->save(false);
+        $cache = Yii::$app->cache;
+    
+    if ($this->save(false)) {
+        
+        $cache->delete('all_articles');
+        $cache->delete('latest_articles');
+
+        return true;
+    }
+    return false;
     }
 }

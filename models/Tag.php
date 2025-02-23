@@ -61,12 +61,10 @@ class Tag extends \yii\db\ActiveRecord
     public static function getArticlesByTag($id)
     {
         // build a DB query to get all articles
-        $query = Article::find()
+        $data = Article::find()
     ->innerJoin('article_tag', 'article_tag.article_id = article.id')
-    ->where(['article_tag.tag_id' => $id]);
-        $count = $query->count();
-        $articles = $query->all();
-        $data['articles'] = $articles;
+    ->where(['article_tag.tag_id' => $id])
+    ->all();
         
         return $data;
     }

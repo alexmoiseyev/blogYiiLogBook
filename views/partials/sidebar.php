@@ -1,6 +1,6 @@
 <?php
 
-use yii\helpers\Html;
+use app\models\Article;
 use yii\helpers\Url;
 
 ?>
@@ -39,10 +39,10 @@ use yii\helpers\Url;
          <?php endforeach;?>
       </ul>
    </div>
-   <!-- latest post -->
+   <!-- latest articles -->
    <div class="widget">
       <h5 class="widget-title"><span>Latest Article</span></h5>
-      <?php foreach($latestArticles as $latestArticle):?>
+      <?php foreach(Article::getLatestArticles() as $latestArticle):?>
       <ul class="list-unstyled widget-list">
          <li class="media widget-post align-items-center">
             <a href="<?= Url::toRoute(['site/view','id'=>$latestArticle->id])?>">
@@ -56,4 +56,4 @@ use yii\helpers\Url;
       </ul>
       <?php endforeach;?>
    </div>
-			</aside>
+</aside>

@@ -24,8 +24,8 @@ use yii\helpers\Url;
 				</ul>
 			</div>
 			<div class="col-12 mb-3">
-				<div class="post-slider">
-					<img style="height:880px;" src="<?=$article->getImage();?>" class="img-fluid" alt="post-thumb">
+				<div class="d-flex justify-content-center">
+					<img style="max-width:1020px;max-height:760px;" src="<?=$article->getImage();?>" class="img-fluid" alt="post-thumb">
 				</div>
 			</div>
 			<div class="col-lg-10 mx-auto">
@@ -33,14 +33,15 @@ use yii\helpers\Url;
 					<p><?= $article->content; ?></p>
 				</div>
 			</div>
-			<div class="article-likes"> 
-					Likes: <span class="likes-count"><?=$article->countLikes()?></span>
+			<div class="article-likes mx-auto"> 
+					Likes: <span class="likes-count text-center"><?=$article->countLikes()?></span>
+					<hr>
 					<a href="<?= Url::toRoute(['/article/unlike' ,'id'=>$article->id]);?>" class="btn btn-danger button-unlike" data-id="<?=1?>">
-							Unlike&nbsp;&nbsp;<span class="fa fa-thumbs-up"></span>
+							Unlike&nbsp;&nbsp;<span class="fa fa-thumbs-down"></span>
 					</a>
 					
 					<a href="<?= Url::toRoute(['/article/like','id'=>$article->id]);?>" class="btn btn-success button-like" data-id="<?=2?>">
-							Like&nbsp;&nbsp;<span class="fa fa-thumbs-down"></span>
+							Like&nbsp;&nbsp;<span class="fa fa-thumbs-up"></span>
 					</a>
 					
 			</div>

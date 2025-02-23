@@ -65,12 +65,10 @@ class SiteController extends Controller
     
     private function _getSharedData()
     {
-        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all();
         $categories = Category::getAll();
         $tags = Tag::find()->all();
 
         return [
-            'latestArticles' => $latestArticles,
             'tags' => $tags,
             'categories' => $categories,
         ];
@@ -108,13 +106,11 @@ class SiteController extends Controller
     }
     public function actionIndex()
     {
-        $latestArticles = Article::getLatestArticles();
-        $articles = Article::find()->orderBy('viewed desc')->all();
+        $articles = Article::getAll();
         $sharedData = $this->_getSharedData();
         return $this->render('index', array_merge(
             $sharedData,
         [
-            'latestArticles'=>$latestArticles,
             'articles'=>$articles,
         ]));
     }
@@ -126,7 +122,7 @@ class SiteController extends Controller
 
         $article->viewedCounter($id);
         
-        return $this->render('single',[
+        return $this->render('view',[
             'tags'=>$tags,
             'categories'=>$categories,
             'article'=>$article,
@@ -137,8 +133,7 @@ class SiteController extends Controller
     {
         $data = Category::getArticlesByCategory($id);
         $sharedData = $this->_getSharedData();
-
-        return $this->render('category', array_merge($sharedData, ['articles' => $data['articles']]));
+        return $this->render('index', array_merge($sharedData, ['articles' => $data, ]));
     }
 
     public function actionTag($id)
@@ -146,7 +141,7 @@ class SiteController extends Controller
         $data = Tag::getArticlesByTag($id);
         $sharedData = $this->_getSharedData();
 
-        return $this->render('tag', array_merge($sharedData, ['articles' => $data['articles']]));
+        return $this->render('index', array_merge($sharedData, ['articles' => $data]));
     }
     public function actionAuthor($id)
     {
@@ -163,7 +158,6 @@ array_merge(
     }
     public function actionHistory($id)
     {
-        
         $redis = Yii::$app->redis;
         $user = User::findOne($id);
         $key = "user:{$user->id}:views";
@@ -179,6 +173,4 @@ array_merge(
             'user'=>$user
         ]));
     }
-
-    
 }
