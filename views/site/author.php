@@ -2,6 +2,8 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 use app\models\User;
+use yii\widgets\ActiveForm;
+
 ?>
 <section class="section-sm border-bottom">
 	<div class="container">
@@ -10,9 +12,9 @@ use app\models\User;
 				<div class="title-bordered mb-5 d-flex align-items-center">
 					<h1 class="h4"><?= $user->name ?></h1>
 					<ul class="list-inline social-icons ml-auto mr-3 d-none d-sm-block">
-						<li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a>
+						<!-- <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a>
 						</li>
-						<li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a>
+						<li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a> -->
 						</li>
 						<li class="list-inline-item"><a href="#"><i class="ti-github"></i></a>
 						</li>
@@ -34,8 +36,16 @@ use app\models\User;
 			</div>
 			<div class="col-lg-9 col-md-8 content text-center text-md-left">
 				<h1> About me: </h1>
-				<p>Lorem ipsum sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet. Donec nisi dolor, consequat vel pretium id, auctor in dui. Nam iaculis, neque ac ullamcorper. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue. Duis auctor lacus id vehicula gravida. Nam suscipit vitae purus et laoreet.</p>
-				<p>Donec nisi dolor, consequat vel pretium id, auctor in dui. Nam iaculis, neque ac ullamcorper.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet vulputate augue.</p>
+				<p><?= $user->about ?></p>
+				<button href="#" class="btn btn-primary" id="toggle-description">изменить описание</button>
+				<div class="about-form d-none mt-5" >
+					<?php $form = ActiveForm::begin(['action' => ['site/set-profile-description']]); ?>
+						<?= $form->field($user, 'about')->textarea(['rows' => 6]) ?>
+						<div class="form-group">
+							<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+						</div>
+					<?php ActiveForm::end(); ?>
+				</div>
 			</div>
 			</div>
 	</div>
@@ -100,3 +110,15 @@ use app\models\User;
 			</div>
 		</div>
 </section>
+<script>
+// Добавляем обработчик события для нажатия на ссылку
+document.getElementById('toggle-description').addEventListener('click', function(e) {
+    e.preventDefault(); // предотвращаем переход по ссылке
+
+    // Находим блок с формой
+    var form = document.querySelector('.about-form');
+    
+    // Переключаем класс 'd-none' для отображения или скрытия формы
+    form.classList.toggle('d-none');
+});
+</script>

@@ -5,20 +5,11 @@ use app\models\Category;
 use app\models\Article;
 use app\models\Tag;
 use app\models\User;
-use app\models\ArticleTag;
-use app\models\ArticleUser;
-use app\models\ImageUpload;
 use Yii;
-use yii\web\UploadedFile;
-use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
 use app\models\ContactForm;
-use yii\httpclient\Client;
 class SiteController extends Controller
 {
     /**
@@ -29,10 +20,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout', 'author'],
+                'only' => ['logout', 'author','contact'],
                 'rules' => [
                     [
-                        'actions' => ['logout', 'author'],
+                        'actions' => ['logout', 'author','contact'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -90,19 +81,16 @@ class SiteController extends Controller
         ]);
     }
     public function actionSearch(){
-        $latestArticles = Article::find()->orderBy('date desc')->limit(4)->all(); 
         $search_input = Yii::$app->request->get('search');
         $search=str_replace(' ', '', $search_input);
         $articles = Article::find()->where(['like', 'replace(title, " ", "")', $search])->all();
-        $categories = Category::find()->all();
-        $tags = Tag::find()->all();
-        return $this->render('index',compact(
-            'articles',
-            'categories',
-            'tags',
-            'latestArticles',
-            'search'
-        ));
+        $sharedData = $this->_getSharedData();
+        return $this->render('index', array_merge(
+            $sharedData,
+        [
+            'articles'=>$articles,
+            'search'=>$search
+        ]));
     }
     public function actionIndex()
     {
@@ -155,6 +143,17 @@ array_merge(
             'articles'=>$articles,
             'user'=>$user
         ]));
+    }
+    public function actionSetProfileDescription(){
+        $user = User::findOne(Yii::$app->user->identity->id);
+        if ($this->request->isPost) {
+            if($this->request->post()){
+                $about = Yii::$app->request->post('User')['about'];
+                $user->saveDescription($about);
+                return $this->redirect(['site/author', 'id' => $user->id]);
+                
+            }
+        }
     }
     public function actionHistory($id)
     {

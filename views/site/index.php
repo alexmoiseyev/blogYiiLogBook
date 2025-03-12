@@ -8,6 +8,7 @@
 					<?php if($articles):?>
 						<p class="f-20"><?=$search ?? ''?></p>
 					<?php foreach($articles as $article):?>
+						<?= Yii::$app->user->identity?($article->isViewed(Yii::$app->user->identity->id) ? 'просмотренно': ''): ''?>
 					<article class="row mb-5">
 						<div class	="col-12">
 							<div class="text-center">

@@ -14,6 +14,7 @@ use yii\web\IdentityInterface;
  * @property string|null $password
  * @property int|null $isAdmin
  * @property string|null $photo
+ * @property string|null $about
  *
  * @property Comment[] $comments
  */
@@ -110,6 +111,12 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $this->image = $filename;
         return $this->save(false);
     }
+    public function saveDescription($about)
+    {
+        $this->about = $about;
+        return $this->save(false);
+    }
+
     public function getImage()
     {
         return ($this->image) ? '/uploads/' . $this->image : '/uploads/no-image.png';

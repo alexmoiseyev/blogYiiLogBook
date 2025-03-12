@@ -8,21 +8,6 @@
                </a>
                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
             </div>
-
-           
-
-            
-
-            <div class="col-md-3 mb-4">
-               <h6 class="mb-4">Subscribe Newsletter</h6>
-               <form class="subscription" action="javascript:void(0)" method="post">
-                  <div class="position-relative">
-                     <i class="ti-email email-icon"></i>
-                     <input type="email" class="form-control" placeholder="Your Email Address">
-                  </div>
-                  <button class="btn btn-primary btn-block rounded" type="submit">Subscribe now</button>
-               </form>
-            </div>
          </div>
          <div class="scroll-top">
             <a href="javascript:void(0);" id="scrollTop"><i class="ti-angle-up"></i></a>

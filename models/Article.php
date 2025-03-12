@@ -107,15 +107,32 @@ class Article extends \yii\db\ActiveRecord
     public function viewedCounter($id)
     {
         $user = Yii::$app->user->identity;
-        $redis = Yii::$app->redis;
-        $redis->sadd("article:{$id}:views", $user->id);
-        $redis->sadd("user:{$user->id}:views", $id);
-        return true;
+        if($user){
+            $redis = Yii::$app->redis;
+            $redis->sadd("article:{$id}:views", $user->id);
+            $redis->sadd("user:{$user->id}:views", $id);
+            return true;
+        }
+        
+        return false;
     }    
     public function countViews(){
         $redis = Yii::$app->redis;
         return $redis->scard("article:{$this->id}:views");
     }
+    public function isViewed($user_id){
+
+        $redis = Yii::$app->redis;
+        $key = "article:{$this->id}:views";
+
+        foreach($redis->smembers($key) as $viewedIds){
+            if($viewedIds == $user_id){
+                return true;
+            }
+        }
+        return false;
+    }
+        
     public function saveImage($filename)
     {
         $this->image = $filename;
