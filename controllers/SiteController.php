@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\ContactForm;
+use yii\web\NotFoundHttpException;
 class SiteController extends Controller
 {
     /**
@@ -131,45 +132,13 @@ class SiteController extends Controller
 
         return $this->render('index', array_merge($sharedData, ['articles' => $data]));
     }
-    public function actionAuthor($id)
-    {
-        $articles = Article::find()->where(['user_id'=>$id])->all();
-        $user = User::findOne($id);
-        $sharedData = $this->_getSharedData();
-        return $this->render('author', 
-array_merge(
-        $sharedData,
-        [
-            'articles'=>$articles,
-            'user'=>$user
-        ]));
-    }
-    public function actionSetProfileDescription(){
-        $user = User::findOne(Yii::$app->user->identity->id);
-        if ($this->request->isPost) {
-            if($this->request->post()){
-                $about = Yii::$app->request->post('User')['about'];
-                $user->saveDescription($about);
-                return $this->redirect(['site/author', 'id' => $user->id]);
-                
-            }
+    
+    
+
+    private function findUserById($id){
+        if($user = User::findOne($id)){
+            return $user;
         }
-    }
-    public function actionHistory($id)
-    {
-        $redis = Yii::$app->redis;
-        $user = User::findOne($id);
-        $key = "user:{$user->id}:views";
-
-        $articles = Article::find()->where(['id' => $redis->smembers($key)])->all();
-
-        $sharedData = $this->_getSharedData();
-        return $this->render('author', 
-array_merge(
-        $sharedData,
-        [
-            'articles'=>$articles,
-            'user'=>$user
-        ]));
+        throw new NotFoundHttpException();
     }
 }

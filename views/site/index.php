@@ -19,7 +19,7 @@
 							<h3><a class="post-title" href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>"><?=$article->title?></a></h3>
 							<ul class="list-inline post-meta mb-4">
 								<li class="list-inline-item"><i class="ti-user mr-2"></i>
-									<a href="<?= Url::toRoute(['site/author', 'id'=>$article->author->id ?? 'No author link']);?>"><?=$article->author->name ?? 'No author'; ?></a>
+									<a href="<?= Url::toRoute(['/profile', 'id'=>$article->author->id ?? 'No author link']);?>"><?=$article->author->name ?? 'No author'; ?></a>
 								</li>
 								<li class="list-inline-item"><?= $article->getDate(); ?></li>
 								<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id ?? 3])?>" class="ml-1"><?= $article->category->title ?? 'No category'; ?></a>

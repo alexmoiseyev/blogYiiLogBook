@@ -127,4 +127,36 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $imageUploadModel = new ImageUpload();
         $imageUploadModel->deleteCurrentImage($this->image);
     }
+
+    public function follow($user)
+    {
+        $redis = Yii::$app->redis;
+        $redis->sadd("user:{$this->id}:subscriptions", $user->id);
+        $redis->sadd("user:{$user->id}:followers", $this->id);
+    }
+    public function unFollow($user){
+        $redis = Yii::$app->redis;
+        $redis->srem("user:{$this->id}:subscriptions", $user->id);
+        $redis->srem("user:{$user->id}:followers", $this->id);
+    }
+    public function getSubscriptions(){
+        $redis = Yii::$app->redis;
+        $key = "user:{$this->getId()}:subscriptions";
+        $ids = $redis->smembers($key);
+        return User::find()->select('id, name')->where(['id'=>$ids])->orderBy('name')->asArray()->all();
+    }
+    public function getFollowers(){
+        $redis = Yii::$app->redis;
+        $key = "user:{$this->getId()}:followers";
+        $ids = $redis->smembers($key);
+        return User::find()->select('id, name')->where(['id'=>$ids])->orderBy('name')->asArray()->all();
+    }
+    public function countSubcriptions(){
+        $redis = Yii::$app->redis;
+        return $redis->scard("user:{$this->getId()}:subscriptions");
+    }
+    public function countFollowers(){
+        $redis = Yii::$app->redis;
+        return $redis->scard("user:{$this->getId()}:followers");
+    }
 }

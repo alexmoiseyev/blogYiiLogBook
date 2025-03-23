@@ -47,7 +47,7 @@
                </li>
                <?php if(!Yii::$app->user->isGuest):?>
                   <li class="nav-item">
-                     <a class="nav-link" href="<?= Url::toRoute(['/author', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Profile</a>
+                     <a class="nav-link" href="<?= Url::toRoute(['/profile', 'id'=>Yii::$app->user->identity->id ?? '0'] )?>">Profile</a>
                   </li>
                <?php endif; ?>
                </li>

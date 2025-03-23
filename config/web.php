@@ -66,6 +66,8 @@ $config = [
             'rules' => [
                 '<a:(admin)>' => 'admin/<a>',
                 '<a:(create|set-image|set-tags|delete)>' => 'article/<a>',
+                '<a:(history|set-subscribe|set-profile-description)>' => 'profile/<a>',
+                'profile/'=>'profile/',
                 '<action:\w+>'=>'site/<action>',
                 
             ],

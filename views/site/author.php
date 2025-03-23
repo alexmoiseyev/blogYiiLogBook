@@ -1,10 +1,18 @@
 <?php
 use yii\helpers\Url;
 use yii\helpers\Html;
-use app\models\User;
 use yii\widgets\ActiveForm;
-
 ?>
+<style>
+        .avatar {
+            width: 150px;
+            height: 150px;
+			border: 2px solid black;
+            border-radius: 50%; /* Чтобы сделать изображение круглым */
+            object-fit: cover; /* Обеспечивает обрезку изображения по размеру */
+        }
+    </style>
+
 <section class="section-sm border-bottom">
 	<div class="container">
 		<div class="row">
@@ -22,24 +30,30 @@ use yii\widgets\ActiveForm;
 				</div>
 			</div>
 			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
-			
-				<img loading="lazy" class="rounded-lg img-fluid" src="<?= $user->getImage()??'/markup/images/author.jpg'?>">
 					<?php if(!Yii::$app->user->isGuest):?>
 						<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
-							<a href="<?= Url::toRoute(['article/set-avatar', 'id'=>$user->id]);?>" class="ml-1 ">
-								<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-file-earmark-image rounded mx-auto d-block" viewBox="0 0 16 16">
-								<path d="M6.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-								<path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM4 1a1 1 0 0 0-1 1v10l2.224-2.224a.5.5 0 0 1 .61-.075L8 11l2.157-3.02a.5.5 0 0 1 .76-.063L13 10V4.5h-2A1.5 1.5 0 0 1 9.5 3V1z"/>
-								</svg></a>
+							<a href="<?= Url::toRoute(['article/set-avatar', 'id'=>$user->id]);?>" class="ml-1 active">
+								<img loading="lazy" class="rounded-circle img-fluid avatar" src="<?= $user->getImage()??'/markup/images/author.jpg'?>">
+							</a>
+						<?php else: ?>
+							<img loading="lazy" class="rounded-circle img-fluid avatar" src="<?= $user->getImage()??'/markup/images/author.jpg'?>">
 						<?php endif;?>
 					<?php endif;?>
 			</div>
 			<div class="col-lg-9 col-md-8 content text-center text-md-left">
 				<h1> About me: </h1>
-				<p><?= $user->about ?></p>
-				<button href="#" class="btn btn-primary" id="toggle-description">изменить описание</button>
+				<p><?= Html::encode($user->about) ?></p>
+				<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
+				<?=Html::button('изменить описание',[
+					'class'=>'btn btn-primary',
+					'id'=>'toggle-description'
+				])?>
+				<?php endif;?>
+				<a href="<?=Url::toRoute(['/profile/subscribe', 'id'=>$user->id]);?>" class="btn">Подписаться</a>	
+				<p><?= $user->countSubcriptions();?></p>
+				<p><?= $user->countFollowers();?></p>
 				<div class="about-form d-none mt-5" >
-					<?php $form = ActiveForm::begin(['action' => ['site/set-profile-description']]); ?>
+					<?php $form = ActiveForm::begin(['action' => ['profile/set-profile-description']]); ?>
 						<?= $form->field($user, 'about')->textarea(['rows' => 6]) ?>
 						<div class="form-group">
 							<?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
@@ -58,8 +72,9 @@ use yii\widgets\ActiveForm;
 			<?php if(!Yii::$app->user->isGuest):?>
 				<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
 					<div class="d-flex justify-content-center mb-20">
-						<a href="<?= Url::toRoute(['author', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-primary">My articles</a>
-						<a href="<?= Url::toRoute(['history', 'id'=>Yii::$app->user->identity->id]);?>" class="btn btn-outline-warning">History</a>
+						<a href="<?= Url::toRoute(['/profile', 'id'=>Yii::$app->user->identity->id]);?>" class="btn <?= $_SERVER['REQUEST_URI'] == '/profile?id='.Yii::$app->user->identity->id ? 'btn-primary' : 'btn-outline-primary'?>">My articles</a>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<a href="<?= Url::toRoute(['/profile/history', 'id'=>Yii::$app->user->identity->id]);?>" class="btn <?= $_SERVER['REQUEST_URI'] == '/history?id='.Yii::$app->user->identity->id ? 'btn-secondary' : 'btn-outline-secondary'?>">History</a>
 					</div>
 				<?php endif;?>
 			<?php endif;?>
@@ -74,14 +89,14 @@ use yii\widgets\ActiveForm;
 						<h3><a class="post-title" href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>"><?=$article->title?></a></h3>
 						<ul class="list-inline post-meta mb-4">
 							<li class="list-inline-item"><i class="ti-user mr-2"></i>
-								<a href="<?= Url::toRoute(['site/author', 'id'=>$article->author->id]);?>"><?=$article->author->name;?></a>
+								<a href="<?= Url::toRoute(['/site/author', 'id'=>$article->author->id]);?>"><?=$article->author->name;?></a>
 							</li>
 							<li class="list-inline-item"><?= $article->getDate(); ?></li>
 							<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id??'0'])?>" class="ml-1"><?= $article->category->title??'No category'; ?></a>
 							</li>
                      <li class="list-inline-item">Tags:
 							<?php foreach($article->tags as $tag):?>
-                        	<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
+                        	<a href="<?= Url::toRoute(['/site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
                      	<?php endforeach; ?>
                         </li>
 						<li class="list-inline-item">Viewed:
@@ -122,3 +137,4 @@ document.getElementById('toggle-description').addEventListener('click', function
     form.classList.toggle('d-none');
 });
 </script>
+
