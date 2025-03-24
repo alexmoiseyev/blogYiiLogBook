@@ -3,23 +3,10 @@
 namespace app\controllers;
 use app\models\Article;
 use app\models\User;
-use app\models\Category;
-use app\models\Tag;
 use Yii;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-class ProfileController extends Controller
+class ProfileController extends BaseController
 {
-    private function _getSharedData()
-    {
-        $categories = Category::getAll();
-        $tags = Tag::find()->all();
-
-        return [
-            'tags' => $tags,
-            'categories' => $categories,
-        ];
-    }
     public function actionIndex($id)
     {
         $articles = Article::find()->where(['user_id' => $id])->all();
@@ -74,7 +61,6 @@ class ProfileController extends Controller
         $redis = Yii::$app->redis;
         $user = User::findOne($id);
         $key = "user:{$user->id}:views";
-
         $articles = Article::find()->where(['id' => $redis->smembers($key)])->all();
 
         $sharedData = $this->_getSharedData();

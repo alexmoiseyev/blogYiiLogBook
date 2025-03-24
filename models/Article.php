@@ -73,7 +73,6 @@ class Article extends \yii\db\ActiveRecord
         $key = 'all_articles';
         
         $data = $cache->get($key);
-
         if ($data === false) {
 
             $data = Article::find()

@@ -7,11 +7,10 @@ use app\models\Tag;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\ContactForm;
 use yii\web\NotFoundHttpException;
-class SiteController extends Controller
+class SiteController extends BaseController
 {
     /**
      * {@inheritdoc}
@@ -55,20 +54,7 @@ class SiteController extends Controller
         ];
     }
     
-    private function _getSharedData()
-    {
-        $categories = Category::getAll();
-        $tags = Tag::find()->all();
-
-        return [
-            'tags' => $tags,
-            'categories' => $categories,
-        ];
-    }
-    private function _getUser(){
-        $user_id = Yii::$app->user->identity->id ?? '0';
-        return $user_id;
-    }
+  
     public function actionContact()
     {
         $model = new ContactForm();

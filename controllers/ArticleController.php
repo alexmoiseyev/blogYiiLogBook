@@ -68,7 +68,7 @@ class ArticleController extends Controller
     public function actionCreate()
     {
         $model = new Article();
-        $modelImage = new ImageUpload;
+        $modelImage = new ImageUpload();
         $categories = ArrayHelper::map(Category::find()->all(), 'id', 'title');
         $selectedTags = $model->getSelectedTags(); 
         $selectedCategory = ($model->category) ? $model->category->id : '0';
@@ -79,7 +79,6 @@ class ArticleController extends Controller
                 $tags = Yii::$app->request->post('tags');
                 $category = Yii::$app->request->post('category');
                 if($model->saveArticle() && $model->validate()){
-                    
                     $model->saveTags($tags);
                     $model->saveCategory($category);
                     $file != null ? $model->saveImage($modelImage->uploadFile($file)) : false;
