@@ -1,6 +1,8 @@
-	<?php 
-	use yii\helpers\Url; 
-	?>
+<?php 
+use yii\helpers\Url;
+use yii\widgets\LinkPager;
+
+?>
 	<section class="section">
 		<div class="container">
 			<div class="row">
@@ -11,7 +13,7 @@
 						<?= Yii::$app->user->identity?($article->isViewed(Yii::$app->user->identity->id) ? 'просмотренно': ''): ''?>
 					<article class="row mb-5">
 						<div class	="col-12">
-							<div class="text-center">
+							<div class="text-center" style="background-color: #f2f2f2;">
 								<img loading="lazy" src="<?= $article->getImage();?>" class="img-fluid img-thumbnail" alt="post-thumb" style="height:440px;">
 							</div>
 						</div>
@@ -26,8 +28,8 @@
 								</li>
 						<li class="list-inline-item">Tags:
 								<?php foreach($article->tags as $tag):?>
-								<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
-							<?php endforeach; ?>
+									<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
+								<?php endforeach; ?>
 							</li>
 							<li class="list-inline-item">Viewed:
 								<?=$article->countViews()?>
@@ -41,6 +43,15 @@
 					<?php else: ?>
 						<p class="">articles with title '<?=$search?>' not found</p>
 					<?php endif;?>
+					<div class="pagination-wrapper">
+						<?= LinkPager::widget([
+							'pagination' => $pages,
+							'options' => ['class' => 'pagination'],
+							'linkContainerOptions' => ['class' => 'page-item'],
+							'linkOptions' => ['class' => 'page-link'],
+							'disabledListItemSubTagOptions' => ['tag' => 'a', 'class' => 'page-link'],
+						]) ?>
+					</div>
 				</div>
 				
 			<?= $this->render('/partials/sidebar.php', [

@@ -16,7 +16,7 @@ class AuthController extends Controller{
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect(['site/author', 'id'=>Yii::$app->user->identity->id ?? '0']);
+            return $this->redirect(['/profile', 'id'=>Yii::$app->user->identity->id ?? '0']);
         }
 
         $model->password = '';

@@ -31,11 +31,13 @@ use yii\helpers\Url;
       <h5 class="widget-title"><span>Tags</span></h5>
       <ul class="list-inline widget-list-inline">
          <?php foreach($tags as $tag):?>
+            <?php if($tag->getArticlesCount() > 0):?>
             <li class="list-inline-item">
                <a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>">
                   <?=$tag->title;?>
                </a>
             </li>
+            <?php endif; ?>
          <?php endforeach;?>
       </ul>
    </div>

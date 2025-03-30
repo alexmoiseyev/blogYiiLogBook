@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 use app\models\Article;
-use app\models\User;
 use app\models\ImageUpload;
 use app\models\Tag;
 use app\models\Category;
@@ -22,10 +21,10 @@ class ArticleController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout','create'],
+                'only' => ['logout','create','like','unlike'],
                 'rules' => [
                     [
-                        'actions' => ['logout','create'],
+                        'actions' => ['logout','create','like','unlike'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -156,22 +155,7 @@ class ArticleController extends Controller
             'categories'=>$categories,
         ]);
     }
-    public function actionSetAvatar($id)
-    {
-        $model = new ImageUpload;
-        
-        if($this->request->isPost)
-        {
-            $user = User::findOne($id);
-            $file = UploadedFile::getInstance($model, 'image');
-            
-            if($user->saveImage($model->uploadFile($file, $user->image)))
-            {
-                return $this->redirect(['site/author', 'id'=>$user->id]);
-            }
-        }
-        return $this->render('image', ['model'=>$model]);
-    }
+    
     public function actionLike($id){
         $user = Yii::$app->user->identity;
         $article = Article::findOne($id);

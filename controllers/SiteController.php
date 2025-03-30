@@ -1,15 +1,14 @@
 <?php
 
 namespace app\controllers;
-use app\models\Category;
 use app\models\Article;
 use app\models\Tag;
-use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\ContactForm;
-use yii\web\NotFoundHttpException;
+use app\models\Feedback;
+
 class SiteController extends BaseController
 {
     /**
@@ -57,38 +56,44 @@ class SiteController extends BaseController
   
     public function actionContact()
     {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
+        $model = new Feedback();
+        if ($model->load(Yii::$app->request->post())) {
             Yii::$app->session->setFlash('contactFormSubmitted');
-
+            $model->saveFeedback(Yii::$app->user->identity);
             return $this->refresh();
         }
-        return $this->render('contact', [
+        return $this->render('feedback', [
             'model' => $model,
         ]);
     }
-    public function actionSearch(){
+    public function actionSearch()
+    {
         $search_input = Yii::$app->request->get('search');
-        $search=str_replace(' ', '', $search_input);
-        $articles = Article::find()->where(['like', 'replace(title, " ", "")', $search])->all();
+        $search = str_replace(' ', '', $search_input);
+        
+        $query = Article::find()->where(['like', 'replace(title, " ", "")', $search]);
+        $paginatedData = $this->_getPaginatedArticles($query);
+        
         $sharedData = $this->_getSharedData();
+        
         return $this->render('index', array_merge(
             $sharedData,
-        [
-            'articles'=>$articles,
-            'search'=>$search
-        ]));
+            $paginatedData,
+            ['search' => $search]
+        ));
     }
     public function actionIndex()
-    {
-        $articles = Article::getAll();
-        $sharedData = $this->_getSharedData();
-        return $this->render('index', array_merge(
-            $sharedData,
-        [
-            'articles'=>$articles,
-        ]));
-    }
+{
+    $query = Article::find();
+    $paginatedData = $this->_getPaginatedArticles($query);
+    
+    $sharedData = $this->_getSharedData();
+    
+    return $this->render('index', array_merge(
+        $sharedData,
+        $paginatedData
+    ));
+}
     public function actionView($id)
     {
         $article = Article::findOne($id);
@@ -106,25 +111,31 @@ class SiteController extends BaseController
     
     public function actionCategory($id)
     {
-        $data = Category::getArticlesByCategory($id);
+        $query = Article::find()->where(['category_id' => $id]);
+        $paginatedData = $this->_getPaginatedArticles($query);
+        
         $sharedData = $this->_getSharedData();
-        return $this->render('index', array_merge($sharedData, ['articles' => $data, ]));
+        
+        return $this->render('index', array_merge(
+            $sharedData,
+            $paginatedData
+        ));
     }
 
     public function actionTag($id)
     {
-        $data = Tag::getArticlesByTag($id);
+        $query = Tag::getArticlesByTagQuery($id); 
+        $paginatedData = $this->_getPaginatedArticles($query);
+        
         $sharedData = $this->_getSharedData();
-
-        return $this->render('index', array_merge($sharedData, ['articles' => $data]));
+        
+        return $this->render('index', array_merge(
+            $sharedData,
+            $paginatedData
+        ));
     }
     
     
 
-    private function findUserById($id){
-        if($user = User::findOne($id)){
-            return $user;
-        }
-        throw new NotFoundHttpException();
-    }
+    
 }

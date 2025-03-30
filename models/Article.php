@@ -67,6 +67,10 @@ class Article extends \yii\db\ActiveRecord
             'likes' => 'Likes',
         ];
     }
+    public static function find()
+    {
+        return parent::find()->orderBy(['date' => SORT_DESC]);
+    }
     public static function getAll()
     {
         $cache = Yii::$app->cache;
@@ -122,10 +126,10 @@ class Article extends \yii\db\ActiveRecord
     public function isViewed($user_id){
 
         $redis = Yii::$app->redis;
-        $key = "article:{$this->id}:views";
+        $key = "user:{$user_id}:views";
 
         foreach($redis->smembers($key) as $viewedIds){
-            if($viewedIds == $user_id){
+            if($viewedIds == $this->id){
                 return true;
             }
         }

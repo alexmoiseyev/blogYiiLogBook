@@ -32,7 +32,7 @@ use yii\widgets\ActiveForm;
 			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
 					<?php if(!Yii::$app->user->isGuest):?>
 						<?php if($_GET['id'] == Yii::$app->user->identity->id):?>
-							<a href="<?= Url::toRoute(['article/set-avatar', 'id'=>$user->id]);?>" class="ml-1 active">
+							<a href="<?= Url::toRoute(['profile/set-avatar', 'id'=>$user->id]);?>" class="ml-1 active">
 								<img loading="lazy" class="rounded-circle img-fluid avatar" src="<?= $user->getImage()??'/markup/images/author.jpg'?>">
 							</a>
 						<?php else: ?>
@@ -50,8 +50,10 @@ use yii\widgets\ActiveForm;
 				])?>
 				<?php endif;?>
 				<a href="<?=Url::toRoute(['/profile/subscribe', 'id'=>$user->id]);?>" class="btn">Подписаться</a>	
-				<p><?= $user->countSubcriptions();?></p>
-				<p><?= $user->countFollowers();?></p>
+				<div class="m-10">
+					<p>Подписки: <?= $user->countSubcriptions();?></p>
+					<p>Подписчики: <?= $user->countFollowers();?></p>
+				</div>
 				<div class="about-form d-none mt-5" >
 					<?php $form = ActiveForm::begin(['action' => ['profile/set-profile-description']]); ?>
 						<?= $form->field($user, 'about')->textarea(['rows' => 6]) ?>
@@ -126,14 +128,11 @@ use yii\widgets\ActiveForm;
 		</div>
 </section>
 <script>
-// Добавляем обработчик события для нажатия на ссылку
 document.getElementById('toggle-description').addEventListener('click', function(e) {
-    e.preventDefault(); // предотвращаем переход по ссылке
+    e.preventDefault(); 
 
-    // Находим блок с формой
     var form = document.querySelector('.about-form');
     
-    // Переключаем класс 'd-none' для отображения или скрытия формы
     form.classList.toggle('d-none');
 });
 </script>

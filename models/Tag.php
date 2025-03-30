@@ -58,6 +58,10 @@ class Tag extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ArticleTag::class, ['tag_id' => 'id']);
     }
+    public function getArticlesCount()
+    {
+        return $this->getArticles()->count();
+    }
     public static function getArticlesByTag($id)
     {
         // build a DB query to get all articles
@@ -67,5 +71,11 @@ class Tag extends \yii\db\ActiveRecord
     ->all();
         
         return $data;
+    }
+    public static function getArticlesByTagQuery($id)
+    {
+        return Article::find()
+            ->innerJoinWith('tags')
+            ->where(['tag.id' => $id]);
     }
 }

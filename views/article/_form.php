@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
     </div>
     <hr>
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Создать статью', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

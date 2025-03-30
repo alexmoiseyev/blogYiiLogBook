@@ -3,8 +3,9 @@
 namespace app\controllers;
 use app\models\Article;
 use app\models\User;
+use app\models\ImageUpload;
+use yii\web\UploadedFile;
 use Yii;
-use yii\web\NotFoundHttpException;
 class ProfileController extends BaseController
 {
     public function actionIndex($id)
@@ -30,6 +31,35 @@ class ProfileController extends BaseController
                 
             }
         }
+    }
+    public function actionSetAvatar($id)
+    {
+        $model = new ImageUpload();
+        
+        if ($this->request->isPost) {
+            $user = User::findOne($id);
+            $file = UploadedFile::getInstance($model, 'image');
+
+            // Проверяем, был ли загружен файл
+            if ($file && $user->saveImage($model->uploadFile($file, $user->image))) {
+                // Если успешная загрузка, возвращаем JSON ответ
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return [
+                    'success' => true,
+                    'message' => 'Avatar updated successfully.',
+                    'url' => \Yii::$app->urlManager->createAbsoluteUrl(['profile/', 'id' => $user->id]), // URL для редиректа
+                ];
+            } else {
+                // В случае ошибки возвращаем сообщение
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return [
+                    'success' => false,
+                    'message' => 'Failed to update avatar.',
+                ];
+            }
+        }
+
+        return $this->render('/site/image', ['model' => $model]);
     }
     public function actionSubscribe($id){
         if (Yii::$app->user->isGuest) {
@@ -71,11 +101,5 @@ array_merge(
             'articles'=>$articles,
             'user'=>$user
         ]));
-    }
-    private function findUserById($id){
-        if($user = User::findOne($id)){
-            return $user;
-        }
-        throw new NotFoundHttpException();
-    }
+    }   
 }
