@@ -6,9 +6,17 @@ use yii\widgets\LinkPager;
 	<section class="section">
 		<div class="container">
 			<div class="row">
+				 <!-- Сначала сайдбар для мобильных устройств -->
+				 <div class="col-lg-4 order-lg-2 mb-5 mb-lg-0 d-block d-lg-none">
+					<?= $this->render('/partials/sidebar.php', [
+						'categories'=>$categories,
+						'tags'=>$tags,
+						'articles'=>$articles,
+					]);?>
+            	</div>
 				<div class="col-lg-8  mb-5 mb-lg-0">
 					<?php if($articles):?>
-						<p class="f-20"><?=$search ?? ''?></p>
+						<p class="f-20 <?=$search ?? 'd-none'?>"><?= $search ?? ''?></p>
 					<?php foreach($articles as $article):?>
 						<?= Yii::$app->user->identity?($article->isViewed(Yii::$app->user->identity->id) ? 'просмотренно': ''): ''?>
 					<article class="row mb-5">
@@ -26,11 +34,14 @@ use yii\widgets\LinkPager;
 								<li class="list-inline-item"><?= $article->getDate(); ?></li>
 								<li class="list-inline-item">Categories : <a href="<?= Url::toRoute(['site/category','id'=>$article->category->id ?? 3])?>" class="ml-1"><?= $article->category->title ?? 'No category'; ?></a>
 								</li>
-						<li class="list-inline-item">Tags:
-								<?php foreach($article->tags as $tag):?>
-									<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" class="ml-1"><?= $tag->title; ?></a>
-								<?php endforeach; ?>
-							</li>
+								<li class="list-inline-item">Tags:
+									<?php foreach($article->tags as $tag): ?>
+										<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" 
+										class="ml-1 <?= in_array($tag->id, $selectedTagIds ?? []) ? 'text-primary font-weight-bold' : '' ?>">
+											<?= $tag->title ?>
+										</a>
+									<?php endforeach; ?>
+								</li>
 							<li class="list-inline-item">Viewed:
 								<?=$article->countViews()?>
 							</li>
@@ -53,7 +64,6 @@ use yii\widgets\LinkPager;
 						]) ?>
 					</div>
 				</div>
-				
 			<?= $this->render('/partials/sidebar.php', [
 					'categories'=>$categories,
 					'tags'=>$tags,

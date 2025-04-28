@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
     </div>
 </section>
 
-<!-- Включите Cropper.js и его стили -->
+<!--Cropper.js и его стили -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 

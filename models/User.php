@@ -151,6 +151,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $ids = $redis->smembers($key);
         return User::find()->select('id, name')->where(['id'=>$ids])->orderBy('name')->asArray()->all();
     }
+    public function isFollower($user_id){
+        $redis = Yii::$app->redis;
+        $key = "user:{$this->getId()}:followers";
+        foreach($redis->smembers($key) as $subsIds){
+            if($subsIds == $user_id){
+                return true;
+            }
+        }
+    }
     public function countSubcriptions(){
         $redis = Yii::$app->redis;
         return $redis->scard("user:{$this->getId()}:subscriptions");

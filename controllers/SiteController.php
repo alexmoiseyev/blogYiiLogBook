@@ -57,7 +57,7 @@ class SiteController extends BaseController
     public function actionContact()
     {
         $model = new Feedback();
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             Yii::$app->session->setFlash('contactFormSubmitted');
             $model->saveFeedback(Yii::$app->user->identity);
             return $this->refresh();
@@ -135,7 +135,25 @@ class SiteController extends BaseController
         ));
     }
     
-    
+    public function actionTagMultiple()
+    {
+        $tagIds = Yii::$app->request->get('tag_ids', []);
+        
+        $query = Article::find()
+            ->innerJoinWith('tags')
+            ->where(['tag.id' => $tagIds])
+            ->groupBy('article.id');
+        
+        $paginatedData = $this->_getPaginatedArticles($query);
+        $sharedData = $this->_getSharedData();
+        
+        return $this->render('index', array_merge(
+            $sharedData,
+            $paginatedData,
+            [
+                'selectedTagIds' => $tagIds
+            ]
+        ));
+    }
 
-    
 }

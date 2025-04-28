@@ -70,7 +70,7 @@
                     </ul>
                 </div>
             <!-- search -->
-            <div class="search px-4">
+            <!-- <div class="search px-4">
                <button id="searchOpen" class="search-btn"><i class="ti-search"></i></button>
                <div class="search-wrapper">
                   <form action="<?= Url::to(['/site/search'])?>" class="h-100">
@@ -79,7 +79,7 @@
                   </form>
                   <button id="searchClose" class="search-close"><i class="ti-close text-dark"></i></button>
                </div>
-            </div>
+            </div> -->
 
          </div>
       </nav>

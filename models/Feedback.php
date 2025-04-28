@@ -33,6 +33,7 @@ class Feedback extends \yii\db\ActiveRecord
         return [
             [['user_id', 'username', 'email', 'message'], 'default', 'value' => null],
             [['user_id'], 'integer'],
+            [['message'], 'required'], 
             [['username', 'email', 'message'], 'string', 'max' => 255],
         ];
     }

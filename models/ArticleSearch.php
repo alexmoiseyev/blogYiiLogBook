@@ -11,6 +11,7 @@ use app\models\Article;
  */
 class ArticleSearch extends Article
 {
+    public $tag_ids;
     /**
      * {@inheritdoc}
      */
@@ -19,6 +20,7 @@ class ArticleSearch extends Article
         return [
             [['id', 'viewed', 'user_id', 'status', 'category_id'], 'integer'],
             [['title', 'description', 'content', 'date', 'image'], 'safe'],
+            [['tag_ids'], 'safe'],
         ];
     }
 
@@ -41,36 +43,21 @@ class ArticleSearch extends Article
     public function search($params)
     {
         $query = Article::find();
-
-        // add conditions that should always apply here
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-
+        
         $this->load($params);
-
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
+        
+        if ($this->tag_ids) {
+            $query->joinWith('tags')
+                  ->andWhere(['tag.id' => $this->tag_ids])
+                  ->groupBy('article.id')
+                  ->having('COUNT(DISTINCT tag.id) = ' . count($this->tag_ids));
         }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'date' => $this->date,
-            'viewed' => $this->viewed,
-            'user_id' => $this->user_id,
-            'status' => $this->status,
-            'category_id' => $this->category_id,
+        
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
         ]);
-
-        $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'content', $this->content])
-            ->andFilterWhere(['like', 'image', $this->image]);
-
-        return $dataProvider;
     }
 }

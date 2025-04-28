@@ -69,6 +69,7 @@ $config = [
                 '<a:(history|set-subscribe|set-profile-description)>' => 'profile/<a>',
                 'profile/'=>'profile/',
                 '<action:\w+>'=>'site/<action>',
+                'site/tag-multiple' => 'site/tag-multiple',
                 
             ],
         ],
@@ -83,6 +84,9 @@ $config = [
         'admin' => [
             'class' => 'app\modules\admin\Module',
         ],
+        'gridview' => [
+        'class' => 'kartik\grid\Module',
+    ],
     ],
     'params' => $params,
 ];

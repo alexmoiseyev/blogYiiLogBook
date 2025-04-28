@@ -49,7 +49,11 @@ use yii\widgets\ActiveForm;
 					'id'=>'toggle-description'
 				])?>
 				<?php endif;?>
-				<a href="<?=Url::toRoute(['/profile/subscribe', 'id'=>$user->id]);?>" class="btn">Подписаться</a>	
+				<?php if (!$user->isFollower(Yii::$app->user->identity->id)):?>
+					<a href="<?=Url::toRoute(['/profile/subscribe', 'id'=>$user->id]);?>" class="btn btn-light">Подписаться</a>	
+				<?php else:?>
+					<a href="<?=Url::toRoute(['/profile/unsubscribe', 'id'=>$user->id]);?>" class="btn">Отписаться</a>	
+				<?php endif?>
 				<div class="m-10">
 					<p>Подписки: <?= $user->countSubcriptions();?></p>
 					<p>Подписчики: <?= $user->countFollowers();?></p>
@@ -109,7 +113,7 @@ use yii\widgets\ActiveForm;
                         <a href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>" class="btn btn-outline-primary">Continue Reading</a>
 						<?php if(!Yii::$app->user->isGuest):?>
 							<?php if(Yii::$app->user->identity->name == $article->author->name):?>
-								<?= Html::a('Delete', ['delete', 'id' => $article->id], [
+								<?= Html::a('Delete', ['article/delete', 'id' => $article->id], [
 									'class' => 'btn btn-danger',
 									'data' => [
 										'confirm' => 'Are you sure you want to delete this item?',

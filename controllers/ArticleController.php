@@ -10,6 +10,9 @@ use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use app\services\ArticleService;
+use app\services\TagService;
+use app\services\ImageUploadService;
 use yii\filters\VerbFilter;
 class ArticleController extends Controller
 {
@@ -67,41 +70,44 @@ class ArticleController extends Controller
     public function actionCreate()
     {
         $model = new Article();
-        $modelImage = new ImageUpload();
-        $categories = ArrayHelper::map(Category::find()->all(), 'id', 'title');
         $selectedTags = $model->getSelectedTags(); 
         $selectedCategory = ($model->category) ? $model->category->id : '0';
-        $tags = ArrayHelper::map(Tag::find()->all(), 'id', 'title');
+        $tagService = new TagService();
+        $imageService = new ImageUploadService();
+
         if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
-                $file = UploadedFile::getInstance($model,'image');
-                $tags = Yii::$app->request->post('tags');
-                $category = Yii::$app->request->post('category');
-                if($model->saveArticle() && $model->validate()){
-                    $model->saveTags($tags);
-                    $model->saveCategory($category);
-                    $file != null ? $model->saveImage($modelImage->uploadFile($file)) : false;
-                    
-                    return $this->redirect(['site/view', 'id' => $model->id]);
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                if ((new ArticleService())->createArticle($model, $this->request->post())) {
+                    if($model->saveArticle()){
+                        $file = UploadedFile::getInstance($model, 'image');
+                        if ($file) {    
+                            $model->image = $imageService->upload($file);
+                            $model->save(false); 
+                        }
+                        $transaction->commit();
+                        return $this->redirect(['site/view', 'id' => $model->id]);
+                        }
                 }
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', 'Ошибка при создании статьи.');
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
             'model' => $model,
-            'selectedTags'=>$selectedTags,
-            'selectedCategory'=>$selectedCategory,
-            'tags'=>$tags,
-            'categories'=>$categories
+            'tags' => $tagService::getList(),
+            'selectedTags' => $selectedTags, 
+            'selectedCategory' => $selectedCategory ,
+            'categories' => Category::getList(),
         ]);
     }
     public function actionDelete($id)
     {
         Article::findOne($id)->delete();
 
-        return $this->redirect(['site/author', 'id'=>Yii::$app->user->identity->id ?? '0']);
+        return $this->redirect(['/profile', 'id'=>Yii::$app->user->identity->id ?? '0']);
     }
     public function actionSetImage($id)
     {

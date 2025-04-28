@@ -132,6 +132,7 @@ class Article extends \yii\db\ActiveRecord
             if($viewedIds == $this->id){
                 return true;
             }
+            return false;
         }
         return false;
     }
@@ -176,10 +177,10 @@ class Article extends \yii\db\ActiveRecord
         
     }
     public function getTags()
-    {
-        return $this->hasMany(Tag::className(), ['id' => 'tag_id'])
-            ->viaTable('article_tag', ['article_id' => 'id']);
-    }
+{
+    return $this->hasMany(Tag::class, ['id' => 'tag_id'])
+        ->viaTable('article_tag', ['article_id' => 'id']);
+}
     public function getSelectedTags()
     {
         $selectedIds = $this->getTags()->select('id')->asArray()->all();
@@ -226,19 +227,18 @@ class Article extends \yii\db\ActiveRecord
     public function countLikes(){    
         $redis = Yii::$app->redis;
         return $redis->scard("article:{$this->id}:likes");
-    }
-    public function saveArticle(){
-        $this->user_id = Yii::$app->user->id;
-        $this->date=date('Y-m-d');
-        $cache = Yii::$app->cache;
+    } 
     
-    if ($this->save(false)) {
+    public function saveArticle($runValidation = false)
+    {
+        $this->user_id = Yii::$app->user->id;
+        $this->date = date('Y-m-d');
         
-        $cache->delete('all_articles');
-        $cache->delete('latest_articles');
-
-        return true;
-    }
-    return false;
+        if ($this->save($runValidation)) {
+            Yii::$app->cache->delete('all_articles');
+            Yii::$app->cache->delete('latest_articles');
+            return true;
+        }
+        return false;
     }
 }

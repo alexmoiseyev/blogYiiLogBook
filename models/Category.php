@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-
+use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "category".
  *
@@ -59,5 +59,8 @@ class Category extends \yii\db\ActiveRecord
         
         return $data;
     }
-    
+    public static function getList(): array
+    {
+        return ArrayHelper::map(self::find()->select(['id', 'title'])->all(), 'id', 'title');
+    }
 }
