@@ -1,7 +1,7 @@
 <?php
 
 namespace app\controllers;
-use yii\data\Pagination;
+
 use app\models\Category;
 use app\models\Tag;
 use app\models\User;
@@ -26,26 +26,5 @@ class BaseController extends Controller
         }
         throw new NotFoundHttpException();
     }
-    protected function _getPaginatedArticles($query, $pageSize = 6, $orderBy = ['id' => SORT_DESC])
-    {
-        $query->orderBy($orderBy); 
-        
-        $countQuery = clone $query;
-        
-        $pages = new Pagination([
-            'totalCount' => $countQuery->count(),
-            'pageSize' => $pageSize,
-            'forcePageParam' => false,
-            'pageSizeParam' => false
-        ]);
-        
-        $articles = $query->offset($pages->offset)
-            ->limit($pages->limit)
-            ->all();
-        
-        return [
-            'articles' => $articles,
-            'pages' => $pages,
-        ];
-    }
+    
 }

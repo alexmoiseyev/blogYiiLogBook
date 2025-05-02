@@ -14,7 +14,14 @@ class ImageUpload extends Model{
     {
         return [
             [['image'], 'required'],
-            [['image'], 'file', 'extensions' => 'jpg, png']
+            [['image'], 'file', 'extensions' => 'jpg, png'],
+            [['image'], 
+            'image', 
+            'minWidth' => 250, 
+            'minHeight' => 250, 
+            'extensions' => 'jpg, gif, png', 
+            'maxSize' => 1024 * 1024 * 2
+        ],
         ];
     }
 
@@ -27,6 +34,10 @@ class ImageUpload extends Model{
        {
            return $this->saveImage();
        }
+       else{
+           return false;
+       }
+       
 
     }
 

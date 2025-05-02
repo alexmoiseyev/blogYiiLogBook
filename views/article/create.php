@@ -11,20 +11,24 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="section-sm">
 	<div class="container">
+        <?php foreach (Yii::$app->session->getAllFlashes() as $type => $message): ?>
+            <div class="alert alert-<?= $type ?>">
+                <?= $message ?>
+            </div>
+        <?php endforeach ?>
+    <div class="article-create">
 
-<div class="article-create">
+        <h1><?= Html::encode($this->title) ?></h1>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+        <?= $this->render('_form', [
+            'model' => $model,
+            'selectedTags'=>$selectedTags,
+            'selectedCategory'=>$selectedCategory,
+            'tags'=>$tags,
+            'categories'=>$categories
+        ]) ?>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-        'selectedTags'=>$selectedTags,
-        'selectedCategory'=>$selectedCategory,
-        'tags'=>$tags,
-        'categories'=>$categories
-    ]) ?>
-
-</div>
+    </div>
 
 	</div>
 </section>

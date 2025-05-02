@@ -7,6 +7,14 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'container' => [
+        'definitions' => [
+            app\services\ArticleService::class => app\services\ArticleService::class,
+            app\services\TagService::class => app\services\TagService::class,
+            app\services\EvaluationService::class => app\services\EvaluationService::class,
+            app\services\ArticleManager::class => app\services\ArticleManager::class,
+        ],
+    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',

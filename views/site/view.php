@@ -25,7 +25,7 @@ use yii\helpers\Url;
 			</div>
 			<div class="col-12 mb-3">
 				<div class="d-flex justify-content-center">
-					<img style="max-width:1020px;max-height:760px;" src="<?=$article->getImage();?>" class="img-fluid" alt="post-thumb">
+					<img style="max-height: 600px" src="<?=$article->getImage();?>" class="img-fluid" alt="post-thumb">
 				</div>
 			</div>
 			<div class="col-lg-10 mx-auto">

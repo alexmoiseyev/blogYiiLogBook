@@ -1,13 +1,18 @@
 <?php
 
 namespace app\controllers;
-use app\models\Article;
-use app\models\Tag;
+
+use app\services\EvaluationService;
+use app\services\ArticleRepository;
+
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\ContactForm;
 use app\models\Feedback;
+use app\models\Article;
+use app\models\Tag;
+
 
 class SiteController extends BaseController
 {
@@ -52,7 +57,17 @@ class SiteController extends BaseController
             ],
         ];
     }
-    
+
+    private ArticleRepository $articleRepository;
+    public function __construct(
+        $id,
+        $module,
+        ArticleRepository $articleRepository,
+        $config = []
+    ) {
+        $this->articleRepository = $articleRepository;
+        parent::__construct($id, $module, $config);
+    }
   
     public function actionContact()
     {
@@ -84,8 +99,8 @@ class SiteController extends BaseController
     }
     public function actionIndex()
 {
-    $query = Article::find();
-    $paginatedData = $this->_getPaginatedArticles($query);
+    $query = $this->articleRepository->getArticles();
+    $paginatedData = $this->articleRepository->getPaginatedArticles($query);
     
     $sharedData = $this->_getSharedData();
     
@@ -96,15 +111,12 @@ class SiteController extends BaseController
 }
     public function actionView($id)
     {
-        $article = Article::findOne($id);
-        $categories = Article::getAll();
+        $article = $this->articleRepository->getArticleById($id);
         $tags = Tag::find()->all();
-
         $article->viewedCounter($id);
         
         return $this->render('view',[
             'tags'=>$tags,
-            'categories'=>$categories,
             'article'=>$article,
         ]);
     }
@@ -112,20 +124,22 @@ class SiteController extends BaseController
     public function actionCategory($id)
     {
         $query = Article::find()->where(['category_id' => $id]);
-        $paginatedData = $this->_getPaginatedArticles($query);
-        
+        $paginatedData = $this->getPaginatedArticles($query);
+        $selectedCategory = $query->where['category_id'];
         $sharedData = $this->_getSharedData();
         
         return $this->render('index', array_merge(
+            ['selectedCategory'=>$selectedCategory],
             $sharedData,
-            $paginatedData
-        ));
+            $paginatedData,
+        ), 
+        );
     }
 
     public function actionTag($id)
     {
         $query = Tag::getArticlesByTagQuery($id); 
-        $paginatedData = $this->_getPaginatedArticles($query);
+        $paginatedData = $this->articleRepository->getPaginatedArticles($query);
         
         $sharedData = $this->_getSharedData();
         
@@ -135,25 +149,22 @@ class SiteController extends BaseController
         ));
     }
     
-    public function actionTagMultiple()
-    {
-        $tagIds = Yii::$app->request->get('tag_ids', []);
-        
-        $query = Article::find()
-            ->innerJoinWith('tags')
-            ->where(['tag.id' => $tagIds])
-            ->groupBy('article.id');
-        
-        $paginatedData = $this->_getPaginatedArticles($query);
-        $sharedData = $this->_getSharedData();
-        
-        return $this->render('index', array_merge(
-            $sharedData,
-            $paginatedData,
-            [
-                'selectedTagIds' => $tagIds
-            ]
-        ));
-    }
+        public function actionTagMultiple()
+        {
+            $tagIds = Yii::$app->request->get('tag_ids', []);
+            
+            $query = $this->articleRepository->findByTagIds($tagIds);
+            
+            $paginatedData = $this->articleRepository->getPaginatedArticles($query);
+            $sharedData = $this->_getSharedData();
+            
+            return $this->render('index', array_merge(
+                $sharedData,
+                $paginatedData,
+                [
+                    'selectedTagIds' => $tagIds
+                ]
+            ));
+        }
 
-}
+    }

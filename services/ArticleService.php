@@ -9,7 +9,7 @@ class ArticleService
 {
     public function createArticle(Article $article, array $postData): bool
     {
-        if ($article->load($postData) && $article->save()) {
+        if ($article->load($postData) && $article->validate() && $article->saveArticle()) {
             (new TagService())->saveTags($article, $postData['tags'] ?? []);
             $article->saveCategory($postData['category'] ?? null);
             return true;

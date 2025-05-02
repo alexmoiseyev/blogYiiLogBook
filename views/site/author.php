@@ -54,10 +54,10 @@ use yii\widgets\ActiveForm;
 				<?php else:?>
 					<a href="<?=Url::toRoute(['/profile/unsubscribe', 'id'=>$user->id]);?>" class="btn">Отписаться</a>	
 				<?php endif?>
-				<div class="m-10">
-					<p>Подписки: <?= $user->countSubcriptions();?></p>
-					<p>Подписчики: <?= $user->countFollowers();?></p>
-				</div>
+					<div class="mt-2">
+						<p>Подписки: <?= $user->countSubcriptions();?></p>
+						<p>Подписчики: <?= $user->countFollowers();?></p>	
+					</div>
 				<div class="about-form d-none mt-5" >
 					<?php $form = ActiveForm::begin(['action' => ['profile/set-profile-description']]); ?>
 						<?= $form->field($user, 'about')->textarea(['rows' => 6]) ?>
@@ -88,7 +88,7 @@ use yii\widgets\ActiveForm;
 				<article class="row mb-5">
 					<div class="col-12">
 						<div class="text-center">
-							<img loading="lazy" src="<?= $article->getImage();?>" class="img-fluid img-thumbnail" alt="post-thumb" style="height:440px;">
+							<img loading="lazy" src="<?= $article->getImage();?>" class="img-fluid img-thumbnail" alt="post-thumb" style="max-height:440px;">
 						</div>
 					</div>
 					<div class="col-12 mx-auto">
@@ -110,19 +110,21 @@ use yii\widgets\ActiveForm;
 						</li>
 						</ul>
 						<p><?=$article->description;?></p> 
-                        <a href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>" class="btn btn-outline-primary">Continue Reading</a>
+                        <a href="<?= Url::toRoute(['site/view', 'id'=>$article->id]);?>" class="btn btn-outline-primary mb-3">Continue Reading</a>
 						<?php if(!Yii::$app->user->isGuest):?>
-							<?php if(Yii::$app->user->identity->name == $article->author->name):?>
-								<?= Html::a('Delete', ['article/delete', 'id' => $article->id], [
-									'class' => 'btn btn-danger',
-									'data' => [
-										'confirm' => 'Are you sure you want to delete this item?',
-										'method' => 'post',
-									],
-								]) ?>
-								<?= Html::a('Set Image', ['article/set-image', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
-								<?= Html::a('Set Tags', ['article/set-tags', 'id' => $article->id], ['class' => 'btn btn-default', 'style'=>'border:1px solid black;']) ?>
-							<? endif;?>
+							<div class="d-flex justify-content-center">
+								<?php if(Yii::$app->user->identity->name == $article->author->name):?>
+									<?= Html::a('Delete', ['article/delete', 'id' => $article->id], [
+										'class' => 'btn btn-danger',
+										'data' => [
+											'confirm' => 'Are you sure you want to delete this item?',
+											'method' => 'post',
+										],
+									]) ?>
+									<?= Html::a('Set Image', ['article/set-image', 'id' => $article->id], ['class' => 'btn btn-warning',]) ?>
+									<?= Html::a('Set Tags', ['article/set-tags', 'id' => $article->id], ['class' => 'btn btn-info',]) ?>
+								<? endif;?>
+							</div>
 						<? endif;?>
 					</div>
 				</article>

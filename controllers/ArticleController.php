@@ -1,18 +1,23 @@
 <?php
 
 namespace app\controllers;
+
+use app\services\ArticleService;
+use app\services\TagService;
+use app\services\ImageUploadService;
+use app\services\EvaluationService;
+
 use app\models\Article;
 use app\models\ImageUpload;
 use app\models\Tag;
 use app\models\Category;
+
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use app\services\ArticleService;
-use app\services\TagService;
-use app\services\ImageUploadService;
+
 use yii\filters\VerbFilter;
 class ArticleController extends Controller
 {
@@ -66,32 +71,49 @@ class ArticleController extends Controller
             ],
         ];
     }
-    
+    private $articleService;
+    private $tagService;
+    private $evaluationService;
+    public function __construct(
+        $id, 
+        $module, 
+        ArticleService $articleService, 
+        TagService $tagService, 
+        EvaluationService $evaluationService,
+        $config = [])
+    {
+        $this->articleService = $articleService;
+        $this->tagService = $tagService;
+        $this->evaluationService = $evaluationService;
+        parent::__construct($id, $module, $config);
+    }
     public function actionCreate()
     {
         $model = new Article();
         $selectedTags = $model->getSelectedTags(); 
         $selectedCategory = ($model->category) ? $model->category->id : '0';
-        $tagService = new TagService();
+        $tagService = $this->tagService;
         $imageService = new ImageUploadService();
 
         if ($this->request->isPost) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                if ((new ArticleService())->createArticle($model, $this->request->post())) {
-                    if($model->saveArticle()){
-                        $file = UploadedFile::getInstance($model, 'image');
-                        if ($file) {    
-                            $model->image = $imageService->upload($file);
-                            $model->save(false); 
+                if ($this->articleService->createArticle($model, $this->request->post())) {
+                    $file = UploadedFile::getInstance($model, 'image');
+                    if ($file) {    
+                        $imageName = $imageService->upload($file);
+                        if ($imageName === false) {
+                            throw new \Exception('Ошибка загрузки изображения. Возможные ошибки: минимальное разрешение 250x250px');
                         }
-                        $transaction->commit();
-                        return $this->redirect(['site/view', 'id' => $model->id]);
-                        }
+                        $model->image = $imageName;
+                        $model->save(false); 
+                    }
+                    $transaction->commit();
+                    return $this->redirect(['site/view', 'id' => $model->id]);
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::$app->session->setFlash('error', 'Ошибка при создании статьи.');
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
 
@@ -99,7 +121,7 @@ class ArticleController extends Controller
             'model' => $model,
             'tags' => $tagService::getList(),
             'selectedTags' => $selectedTags, 
-            'selectedCategory' => $selectedCategory ,
+            'selectedCategory' => $selectedCategory,
             'categories' => Category::getList(),
         ]);
     }
@@ -118,7 +140,7 @@ class ArticleController extends Controller
             $article = Article::findOne($id);
             $file = UploadedFile::getInstance($model, 'image');
         
-            if($article->saveImage($model->uploadFile($file, $article->image)))
+            if($article->saveImage($model->uploadFile($file)))
             {
                 return $this->redirect(['site/view', 'id'=>$article->id]);
             }
@@ -165,13 +187,13 @@ class ArticleController extends Controller
     public function actionLike($id){
         $user = Yii::$app->user->identity;
         $article = Article::findOne($id);
-        $article->like($user);
+        $this->evaluationService->like($article, $user);
         return $this->redirect(['site/view', 'id'=>$id]);
     }
     public function actionUnlike($id){
         $user = Yii::$app->user->identity;
         $article = Article::findOne($id);
-        $article->unLike($user);
+        $this->evaluationService->unlike($article, $user);
         return $this->redirect(['site/view', 'id'=>$id]);
     }
 }
