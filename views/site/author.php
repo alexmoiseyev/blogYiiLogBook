@@ -54,6 +54,7 @@ use yii\widgets\ActiveForm;
 				<?php else:?>
 					<a href="<?=Url::toRoute(['/profile/unsubscribe', 'id'=>$user->id]);?>" class="btn">Отписаться</a>	
 				<?php endif?>
+					<a href="<?=Url::toRoute(['#', 'id'=>$user->id]);?>" class="btn btn-danger" style="color: white;">Пожаловаться</a>	
 					<div class="mt-2">
 						<p>Подписки: <?= $user->countSubcriptions();?></p>
 						<p>Подписчики: <?= $user->countFollowers();?></p>	
