@@ -5,6 +5,8 @@ use app\models\Article;
 use yii\db\ActiveQuery;
 use yii\data\Pagination;
 
+use Yii;
+
 class ArticleRepository
 {
     public function getArticleById(int $id): Article
@@ -15,13 +17,23 @@ class ArticleRepository
         }
         return $article;
     }
-    public function getArticles(): ActiveQuery
+    public function getArticles()
     {
-        $article = Article::find();
-        if (!$article) {
+        $cache = Yii::$app->cache;
+        $key = 'all_articles';
+
+        $query = $cache->get($key);
+
+        if ($query === false) {
+            $query = Article::find(); // Добавьте нужные условия
+            $cache->set($key, $query, 3600);
+        }
+
+        if (!$query) {
             throw new \yii\web\NotFoundHttpException('Статей нет');
         }
-        return $article;
+
+        return $query;
     }
     public function findByTagIds(array $tagIds): ActiveQuery{
             return Article::find()
@@ -31,10 +43,12 @@ class ArticleRepository
     }
     public function getPaginatedArticles($query, $pageSize = 6, $orderBy = ['id' => SORT_DESC])
     {
-        $query->orderBy($orderBy); 
         
+        if (!$query instanceof \yii\db\ActiveQuery) {
+            throw new \InvalidArgumentException('Parameter $query must be an instance of ActiveQuery');
+        }
         $countQuery = clone $query;
-        
+
         $pages = new Pagination([
             'totalCount' => $countQuery->count(),
             'pageSize' => $pageSize,

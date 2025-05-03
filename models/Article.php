@@ -71,23 +71,23 @@ class Article extends \yii\db\ActiveRecord
     {
         return parent::find()->orderBy(['date' => SORT_DESC]);
     }
-    public static function getAll()
-    {
-        $cache = Yii::$app->cache;
-        $key = 'all_articles';
+    // public static function getAll()
+    // {
+    //     $cache = Yii::$app->cache;
+    //     $key = 'all_articles';
         
-        $data = $cache->get($key);
-        if ($data === false) {
+    //     $data = $cache->get($key);
+    //     if ($data === false) {
 
-            $data = Article::find()
-            ->orderBy('date desc')
-            ->all();
+    //         $data = Article::find()
+    //         ->orderBy('date desc')
+    //         ->all();
             
-            $cache->set($key, $data, 3600);// Кешируем на 1 час
-        }
+    //         $cache->set($key, $data, 3600);// Кешируем на 1 час
+    //     }
         
-        return $data;
-    }
+    //     return $data;
+    // }
     public static function getLatestArticles()
     {
         $cache = Yii::$app->cache;
@@ -132,7 +132,7 @@ class Article extends \yii\db\ActiveRecord
             if($viewedIds == $this->id){
                 return true;
             }
-            return false;
+            
         }
         return false;
     }

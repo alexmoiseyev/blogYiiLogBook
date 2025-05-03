@@ -1,7 +1,6 @@
 <?php 
 use yii\helpers\Url;
 use yii\widgets\LinkPager;
-
 ?>
 	<section class="section">
 		<div class="container">
@@ -18,7 +17,7 @@ use yii\widgets\LinkPager;
 					<?php if($articles):?>
 						<p class="f-20 <?=$search ?? 'd-none'?>"><?= "Результат поиска: «" . isset($search) . "»" ?? ''?></p>
 					<?php foreach($articles as $article):?>
-						<?= Yii::$app->user->identity?($article->isViewed(Yii::$app->user->identity->id) ? 'просмотренно': ''): ''?>
+						<p class="<?=$article->isViewed(Yii::$app->user->identity->id) ? '': 'd-none' ?>">просмотренно</p>
 					<article class="row mb-5">
 						<div class	="col-12">
 							<div class="text-center" style="background-color: #f2f2f2;">
@@ -53,7 +52,7 @@ use yii\widgets\LinkPager;
 					</article>
 					<?php endforeach;?>
 					<?php else: ?>
-						<p class="">articles with title '<?=$search?>' not found</p>
+						<p class="">articles with title '<?=$search??0?>' not found</p>
 					<?php endif;?>
 					<div class="pagination-wrapper">
 						<?= LinkPager::widget([
