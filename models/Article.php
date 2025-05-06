@@ -110,31 +110,40 @@ class Article extends \yii\db\ActiveRecord
     public function viewedCounter($id)
     {
         $user = Yii::$app->user->identity;
-        if($user){
+        if ($user) {
             $redis = Yii::$app->redis;
-            $redis->sadd("article:{$id}:views", $user->id);
-            $redis->sadd("user:{$user->id}:views", $id);
-            return true;
+            $userId = $user->id;
+            $userViewsKey = "user:{$userId}:views";
+            
+            // Проверяем, есть ли уже эта статья в истории просмотров пользователя
+            $viewedIds = $redis->lrange($userViewsKey, 0, -1);
+            
+            if (!in_array($id, $viewedIds)) {
+                // Добавляем просмотр только если его еще не было
+                $redis->lpush($userViewsKey, $id);
+                $redis->ltrim($userViewsKey, 0, 49); // Ограничиваем историю 50 последними просмотрами
+                
+                // Обновляем счетчик просмотров для статьи 
+                $redis->pfadd("article:{$id}:views:hll", $userId);
+                
+                return true;
+            }
         }
         
         return false;
-    }    
+    }
     public function countViews(){
         $redis = Yii::$app->redis;
-        return $redis->scard("article:{$this->id}:views");
+        return $redis->pfcount("article:{$this->id}:views:hll");
     }
-    public function isViewed($user_id){
-
+    public function isViewed($user_id)
+    {
         $redis = Yii::$app->redis;
         $key = "user:{$user_id}:views";
-
-        foreach($redis->smembers($key) as $viewedIds){
-            if($viewedIds == $this->id){
-                return true;
-            }
-            
-        }
-        return false;
+        
+        $viewedIds = $redis->lrange($key, 0, -1);
+        
+        return in_array($this->id, $viewedIds);
     }
         
     public function saveImage($filename)
@@ -212,7 +221,7 @@ class Article extends \yii\db\ActiveRecord
 
         $redis = Yii::$app->redis;
         $cache = Yii::$app->cache;
-
+        
         $redis->sadd("article:{$this->id}:likes", $user->id);
         $redis->sadd("user:{$user->id}:likes", $this->id);
         
@@ -221,8 +230,12 @@ class Article extends \yii\db\ActiveRecord
 
     public function unLike($user){
         $redis = Yii::$app->redis;
+        $cache = Yii::$app->cache;
+
         $redis->srem("article:{$this->id}:likes", $user->id);
         $redis->srem("user:{$user->id}:likes", $this->id);
+
+        $cache->delete('likes_count_' . $this->id);
     }
     public function countLikes(){    
         $redis = Yii::$app->redis;

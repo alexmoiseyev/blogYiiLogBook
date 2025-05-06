@@ -15,9 +15,11 @@ use yii\widgets\LinkPager;
             	</div>
 				<div class="col-lg-8  mb-5 mb-lg-0">
 					<?php if($articles):?>
-						<p class="f-20 <?=$search ?? 'd-none'?>"><?= "Результат поиска: «" . isset($search) . "»" ?? ''?></p>
+						<p class="f-20 <?=$search ?? 'd-none'?>">
+							<?= isset($search) ? "Результат поиска: «" . $search . "»" : '' ?>
+						</p>
 					<?php foreach($articles as $article):?>
-						<p class="<?=$article->isViewed(Yii::$app->user->identity->id) ? '': 'd-none' ?>">просмотренно</p>
+						<p class="<?=$article->isViewed(isset(Yii::$app->user->identity->id)) ? '': 'd-none' ?>">просмотренно</p>
 					<article class="row mb-5">
 						<div class	="col-12">
 							<div class="text-center" style="background-color: #f2f2f2;">
@@ -32,11 +34,11 @@ use yii\widgets\LinkPager;
 								</li>
 								<li class="list-inline-item"><?= $article->getDate(); ?></li>
 								<li class="list-inline-item">Categories : 
-									<a href="<?= Url::toRoute(['site/category','id'=>$article->category_id ?? 3])?>" class="ml-1 <?= isset($selectedCategory) == $article->category_id && isset($selectedCategory) != 0 ? 'text-primary font-weight-bold' : '' ?>"><?= $article->category->title ?? 'No category'; ?></a>
+									<a href="<?= Url::toRoute(['site/multiple-search','category_id'=>$article->category_id ?? 3])?>" class="ml-1 <?= ($article->category_id == isset($selectedCategory) && isset($selectedCategory) != 0) ? 'text-primary font-weight-bold' : '' ?>"><?= $article->category->title ?? 'No category'; ?></a>
 								</li>
 								<li class="list-inline-item">Tags:
 									<?php foreach($article->tags as $tag): ?>
-										<a href="<?= Url::toRoute(['site/tag','id'=>$tag->id])?>" 
+										<a href="<?= Url::toRoute(['site/multiple-search', 'tag_ids[]'=>$tag->id])?>" 
 										class="ml-1 <?= in_array($tag->id, $selectedTagIds ?? []) ? 'text-primary font-weight-bold' : '' ?>">
 											<?= $tag->title ?>
 										</a>

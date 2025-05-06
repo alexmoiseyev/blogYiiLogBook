@@ -1,13 +1,27 @@
 <?php
 
 namespace app\controllers;
+use app\services\ArticleRepository;
+
 use app\models\Article;
+use app\models\Report;
 use app\models\User;
 use app\models\ImageUpload;
+
 use yii\web\UploadedFile;
 use Yii;
 class ProfileController extends BaseController
 {
+    private ArticleRepository $articleRepository;
+    public function __construct(
+        $id,
+        $module,
+        ArticleRepository $articleRepository,
+        $config = []
+    ) {
+        $this->articleRepository = $articleRepository;
+        parent::__construct($id, $module, $config);
+    }
     public function actionIndex($id)
     {
         $articles = Article::find()->where(['user_id' => $id])->all();
@@ -91,15 +105,46 @@ class ProfileController extends BaseController
         $redis = Yii::$app->redis;
         $user = User::findOne($id);
         $key = "user:{$user->id}:views";
-        $articles = Article::find()->where(['id' => $redis->smembers($key)])->all();
-
+        
+        // Получаем последние 50 просмотров (в обратном порядке, так как мы добавляли через lpush)
+        $articleIds = $redis->lrange($key, 0, -1);
+        
+        // Находим статьи, сохраняя порядок из Redis
+        $articles = [];
+        foreach ($articleIds as $articleId) {
+            $article = $this->articleRepository->getArticleById($articleId);
+            if ($article) {
+                $articles[] = $article;
+            }
+        }
+        
         $sharedData = $this->_getSharedData();
         return $this->render('/site/author', 
-array_merge(
-        $sharedData,
+            array_merge(
+                $sharedData,
+                [
+                    'articles' => $articles,
+                    'user' => $user
+                ]
+            )
+        );
+    }
+
+    public function actionReport($user_id){
+        
+        $reportModel = new Report();
+        $user=User::findOne($user_id);
+        if ($reportModel->load(Yii::$app->request->post()) && $reportModel->validate()) {
+            $reportModel->user_id = $user_id;
+            $reportModel->save(false);
+            return $this->refresh();
+        }
+        
+        return $this->render('/site/report',
         [
-            'articles'=>$articles,
+            'reportModel'=>$reportModel,
             'user'=>$user
-        ]));
-    }   
+        ]
+    );
+    }
 }

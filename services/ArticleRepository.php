@@ -41,6 +41,25 @@ class ArticleRepository
         ->where(['tag.id' => $tagIds])
         ->groupBy('article.id');
     }
+    public function findByCategoryId($category_id): ActiveQuery{
+        return Article::find()->where(['category_id' => $category_id])->groupBy('article.id');;
+    }
+    public function findByMultiple(array $tagIds, $category_id): ActiveQuery{
+        return Article::find()
+        ->innerJoinWith('tags')
+        ->where(['tag.id' => $tagIds])
+        ->groupBy('article.id')
+        ->andWhere(['category_id' => $category_id]);
+    }
+    public function findArticles(array $tagIds, $categoryId ){
+        if($categoryId == null && $tagIds != null){
+            return $this->findByTagIds($tagIds);
+        }else if($categoryId != null && $tagIds == null) {
+            return $this->findByCategoryId($categoryId);
+        }else{
+           return $this->findByMultiple($tagIds, $categoryId);
+        }
+    }
     public function getPaginatedArticles($query, $pageSize = 6, $orderBy = ['id' => SORT_DESC])
     {
         

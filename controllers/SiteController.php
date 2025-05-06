@@ -87,7 +87,7 @@ class SiteController extends BaseController
         $search = str_replace(' ', '', $search_input);
         
         $query = Article::find()->where(['like', 'replace(title, " ", "")', $search]);
-        $paginatedData = $this->_getPaginatedArticles($query);
+        $paginatedData = $this->articleRepository->getPaginatedArticles($query);
         
         $sharedData = $this->_getSharedData();
         
@@ -98,17 +98,17 @@ class SiteController extends BaseController
         ));
     }
     public function actionIndex()
-{
-    $query = $this->articleRepository->getArticles();
-    $paginatedData = $this->articleRepository->getPaginatedArticles($query);
-    
-    $sharedData = $this->_getSharedData();
-    
-    return $this->render('index', array_merge(
-        $sharedData,
-        $paginatedData
-    ));
-}
+    {
+        $query = $this->articleRepository->getArticles();
+        $paginatedData = $this->articleRepository->getPaginatedArticles($query);
+        
+        $sharedData = $this->_getSharedData();
+        
+        return $this->render('index', array_merge(
+            $sharedData,
+            $paginatedData
+        ));
+    }
     public function actionView($id)
     {
         $article = $this->articleRepository->getArticleById($id);
@@ -124,7 +124,7 @@ class SiteController extends BaseController
     public function actionCategory($id)
     {
         $query = Article::find()->where(['category_id' => $id]);
-        $paginatedData = $this->getPaginatedArticles($query);
+        $paginatedData = $this->articleRepository->getPaginatedArticles($query);
         $selectedCategory = $query->where['category_id'];
         $sharedData = $this->_getSharedData();
         
@@ -149,11 +149,12 @@ class SiteController extends BaseController
         ));
     }
     
-        public function actionTagMultiple()
+        public function actionMultipleSearch()
         {
             $tagIds = Yii::$app->request->get('tag_ids', []);
-            
-            $query = $this->articleRepository->findByTagIds($tagIds);
+            $categoryId = Yii::$app->request->get('category_id', []);
+
+            $query = $this->articleRepository->findArticles($tagIds, $categoryId);
             
             $paginatedData = $this->articleRepository->getPaginatedArticles($query);
             $sharedData = $this->_getSharedData();
@@ -162,7 +163,8 @@ class SiteController extends BaseController
                 $sharedData,
                 $paginatedData,
                 [
-                    'selectedTagIds' => $tagIds
+                    'selectedTagIds' => $tagIds,
+                    'selectedCategory'=>$categoryId
                 ]
             ));
         }

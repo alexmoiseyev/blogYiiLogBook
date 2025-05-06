@@ -14,56 +14,47 @@ use yii\helpers\ArrayHelper;
          </button>
       </form>
    </div>
-   <!-- categories -->
    <div class="widget">
-   <h5 class="widget-title"><span>Categories</span></h5>
-   <div class="dropdown position-relative"> <!-- Добавлено position-relative -->
-      <button class="btn btn-secondary dropdown-toggle w-100 text-center" type="button" 
-               id="categoriesDropdown" data-toggle="dropdown" 
-               aria-haspopup="true" aria-expanded="false">
-         Выберите категорию
-      </button>
-      <div class="dropdown-menu w-100" aria-labelledby="categoriesDropdown" 
-            style="max-height: 300px; overflow-y: auto;"> <!-- Добавлены стили для прокрутки -->
-         <?php foreach($categories as $category): ?>
-         <?php if($category->getArticlesCount() > 0): ?>
-            <a class="dropdown-item d-flex justify-content-between align-items-center" 
-               href="<?= Url::toRoute(['site/category','id'=>$category->id]) ?>">
-               <?= $category->title ?> 
-               <span class="badge badge-light"><?= $category->getArticlesCount() ?></span>
-            </a>
-         <?php endif; ?>
-         <?php endforeach; ?>
-      </div>
-   </div>
-   </div>
-   <!-- tags -->
-   <div class="widget">
-    <h5 class="widget-title"><span>Tags</span></h5>
-    <div class="dropdown position-relative"> <!-- Добавлено position-relative -->
-      <button class="btn btn-secondary dropdown-toggle w-100 text-center" type="button" id="categoriesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-         Выберите теги
-      </button>
-      <div class="dropdown-menu w-100" aria-labelledby="categoriesDropdown" style="max-height: 300px; overflow-y: auto;">
-            
-      <form action="<?= yii\helpers\Url::to(['site/tag-multiple']) ?>" method="get">
+      <h5 class="widget-title"><span>Categories & Tags</span></h5>
+      <div class="dropdown position-relative">
+         <button class="btn btn-secondary dropdown-toggle w-100 text-center" type="button" 
+                  id="filterDropdown" data-toggle="dropdown" 
+                  aria-haspopup="true" aria-expanded="false">
+            Фильтровать статьи
+         </button>
+         <div class="dropdown-menu w-100" aria-labelledby="filterDropdown" 
+               style="max-height: 300px; overflow-y: auto;">
+            <form action="<?= yii\helpers\Url::to(['site/multiple-search']) ?>" method="get">
+               <label>Категория:</label>
+               <?= Html::dropDownList(
+                     'category_id',  
+                     null,
+                     ArrayHelper::map($categories, 'id', 'title'),
+                     [
+                        'multiple' => false,
+                        'size' => 5,
+                        'class' => 'form-control'
+                     ]
+               ) ?>
 
-         <?= Html::dropDownList(
-               'tag_ids',
-               null,
-               ArrayHelper::map($tags, 'id', 'title'),
-               [
-                  'multiple' => true,
-                  'size' => 5,
-                  'class' => 'form-control'
-               ]
-         ) ?>
-         
-         <button type="submit" class="btn btn-primary mt-2">Поиск</button>
-      </form>
+               <!-- Выбор тегов (множественный) -->
+               <label class="mt-3">Теги:</label>
+               <?= Html::dropDownList(
+                     'tag_ids[]',  // name с [] для множественного выбора
+                     null,
+                     ArrayHelper::map($tags, 'id', 'title'),
+                     [
+                        'multiple' => true,
+                        'size' => 5,
+                        'class' => 'form-control'
+                     ]
+               ) ?>
+               
+               <button type="submit" class="btn btn-primary mt-3 w-100">Поиск</button>
+            </form>
+         </div>
       </div>
    </div>
-</div>
    <!-- latest articles -->
    <div class="widget d-none d-lg-block">
       <h5 class="widget-title"><span>Latest Article</span></h5>
